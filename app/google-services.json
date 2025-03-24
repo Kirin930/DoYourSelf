@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "151207932394",
+    "project_id": "doyourselfapp",
+    "storage_bucket": "doyourselfapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:151207932394:android:05116fae874becd6cf8293",
+        "android_client_info": {
+          "package_name": "com.example.doyourself"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy_JjdM7kfVwCfd40U-4bSatY25JQISK8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
