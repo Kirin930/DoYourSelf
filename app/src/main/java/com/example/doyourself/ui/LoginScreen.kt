@@ -13,9 +13,12 @@ import com.google.android.gms.auth.api.signin.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import android.util.Log
+import android.widget.Toast
+
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(onLoginSuccess: () -> Unit) {
     val context = LocalContext.current
     val activity = context as Activity
 
@@ -49,7 +52,9 @@ fun LoginScreen() {
                                     )
                                 )
                             }
-                            activity.recreate() // Restart MainActivity to show HomeScreen
+                            Toast.makeText(context, "Login OK", Toast.LENGTH_SHORT).show()
+                            Log.d("Login", "User: ${user.displayName}")
+                            onLoginSuccess()
                         }
                     } else {
                         loading = false
@@ -62,7 +67,7 @@ fun LoginScreen() {
     }
 
     val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestIdToken("1:151207932394:android:05116fae874becd6cf8293") // 🔐 get this from Firebase project settings
+        .requestIdToken("151207932394-qkq5hm0336inqsetb189pqho8kce31pc.apps.googleusercontent.com") // 🔐 get this from Firebase project settings
         .requestEmail()
         .build()
 
