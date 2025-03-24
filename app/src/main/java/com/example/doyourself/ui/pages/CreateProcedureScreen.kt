@@ -8,8 +8,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -58,19 +56,18 @@ fun CreateProcedureScreen(navController: NavController) {
                         step.blocks.add(to, movedBlock)
                     }
                 },
+                onRemoveBlock = { blockIndex ->
+                    if (blockIndex in step.blocks.indices) step.blocks.removeAt(blockIndex)
+                },
                 onRemoveStep = { steps.remove(step) },
                 onMoveStepUp = {
                     if (index > 0) {
-                        val temp = steps[index - 1]
-                        steps[index - 1] = steps[index]
-                        steps[index] = temp
+                        steps.removeAt(index).also { steps.add(index - 1, it) }
                     }
                 },
                 onMoveStepDown = {
                     if (index < steps.lastIndex) {
-                        val temp = steps[index + 1]
-                        steps[index + 1] = steps[index]
-                        steps[index] = temp
+                        steps.removeAt(index).also { steps.add(index + 1, it) }
                     }
                 },
                 modifier = Modifier
@@ -91,6 +88,7 @@ fun StepEditor(
     stepNumber: Int,
     onAddBlock: (ContentBlock) -> Unit,
     onMoveBlock: (from: Int, to: Int) -> Unit,
+    onRemoveBlock: (index: Int) -> Unit,
     onRemoveStep: () -> Unit,
     onMoveStepUp: () -> Unit,
     onMoveStepDown: () -> Unit,
@@ -126,44 +124,52 @@ fun StepEditor(
 
         if (!collapsed) {
             step.blocks.forEachIndexed { i, block ->
-                when (block) {
-                    is ContentBlock.Text -> {
-                        var text by remember { mutableStateOf(block.text) }
-                        OutlinedTextField(
-                            value = text,
-                            onValueChange = {
-                                text = it
-                                step.blocks[i] = ContentBlock.Text(it)
-                            },
-                            placeholder = { Text("Enter text...") },
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
-                        )
-                    }
-                    is ContentBlock.Image -> {
-                        block.uri?.let { uri ->
-                            Image(
-                                painter = rememberAsyncImagePainter(uri),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxWidth().height(200.dp).padding(vertical = 4.dp)
-                            )
-                        } ?: Text("[Empty Image Block]", color = Color.Gray, modifier = Modifier.padding(8.dp))
-                    }
-                    is ContentBlock.Video -> {
-                        Text("[Video Placeholder]", color = Color.Gray, modifier = Modifier.padding(8.dp))
-                    }
-                }
+                Row(
+                    verticalAlignment = Alignment.Top,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        when (block) {
+                            is ContentBlock.Text -> {
+                                OutlinedTextField(
+                                    value = block.text,
+                                    onValueChange = {
+                                        step.blocks[i] = ContentBlock.Text(it)
+                                    },
+                                    placeholder = { Text("Enter text...") },
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                                )
+                            }
+                            is ContentBlock.Image -> {
+                                block.uri?.let { uri ->
+                                    Image(
+                                        painter = rememberAsyncImagePainter(uri),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxWidth().height(200.dp).padding(vertical = 4.dp)
+                                    )
+                                } ?: Text("[Empty Image Block]", color = Color.Gray, modifier = Modifier.padding(8.dp))
+                            }
+                            is ContentBlock.Video -> {
+                                Text("[Video Placeholder]", color = Color.Gray, modifier = Modifier.padding(8.dp))
+                            }
+                        }
 
-                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    if (i > 0) {
-                        TextButton(onClick = { onMoveBlock(i, i - 1) }) {
-                            Text("Move Up")
+                        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                            if (i > 0) {
+                                TextButton(onClick = { onMoveBlock(i, i - 1) }) {
+                                    Text("Move Up")
+                                }
+                            }
+                            if (i < step.blocks.lastIndex) {
+                                TextButton(onClick = { onMoveBlock(i, i + 1) }) {
+                                    Text("Move Down")
+                                }
+                            }
                         }
                     }
-                    if (i < step.blocks.lastIndex) {
-                        TextButton(onClick = { onMoveBlock(i, i + 1) }) {
-                            Text("Move Down")
-                        }
+                    IconButton(onClick = { onRemoveBlock(i) }) {
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Block")
                     }
                 }
             }
