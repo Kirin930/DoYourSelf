@@ -1,6 +1,9 @@
 package com.example.doyourself.ui.pages
 
 import android.net.Uri
+import android.widget.FrameLayout
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,8 +20,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import java.util.*
 
 @Composable
@@ -95,6 +102,27 @@ fun StepEditor(
     modifier: Modifier = Modifier
 ) {
     var collapsed by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    var imagePickTargetIndex by remember { mutableIntStateOf(-1) }
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            if (uri != null && imagePickTargetIndex != -1) {
+                step.blocks[imagePickTargetIndex] = ContentBlock.Image(uri)
+            }
+        }
+    )
+
+    var videoPickTargetIndex by remember { mutableIntStateOf(-1) }
+    val videoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            if (uri != null && videoPickTargetIndex != -1) {
+                step.blocks[videoPickTargetIndex] = ContentBlock.Video(uri)
+            }
+        }
+    )
 
     Column(modifier = modifier) {
         Row(
@@ -141,17 +169,53 @@ fun StepEditor(
                                 )
                             }
                             is ContentBlock.Image -> {
-                                block.uri?.let { uri ->
+                                if (block.uri != null) {
                                     Image(
-                                        painter = rememberAsyncImagePainter(uri),
+                                        painter = rememberAsyncImagePainter(block.uri),
                                         contentDescription = null,
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier.fillMaxWidth().height(200.dp).padding(vertical = 4.dp)
                                     )
-                                } ?: Text("[Empty Image Block]", color = Color.Gray, modifier = Modifier.padding(8.dp))
+                                } else {
+                                    TextButton(onClick = {
+                                        imagePickTargetIndex = i
+                                        imagePickerLauncher.launch("image/*")
+                                    }) {
+                                        Text("Select Image")
+                                    }
+                                }
                             }
                             is ContentBlock.Video -> {
-                                Text("[Video Placeholder]", color = Color.Gray, modifier = Modifier.padding(8.dp))
+                                val videoUri = block.uri
+                                if (videoUri != null) {
+                                    val context = LocalContext.current
+                                    val exoPlayer = remember(videoUri) {
+                                        ExoPlayer.Builder(context).build().apply {
+                                            setMediaItem(MediaItem.fromUri(videoUri))
+                                            prepare()
+                                            playWhenReady = false
+                                        }
+                                    }
+                                    AndroidView(
+                                        factory = {
+                                            PlayerView(it).apply {
+                                                player = exoPlayer
+                                                layoutParams = FrameLayout.LayoutParams(
+                                                    FrameLayout.LayoutParams.MATCH_PARENT,
+                                                    600
+                                                )
+                                            }
+                                        },
+                                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                                    )
+                                } else {
+                                    TextButton(onClick = {
+                                        videoPickTargetIndex = i
+                                        videoPickerLauncher.launch("video/*")
+                                    }) {
+                                        Text("Select Video")
+                                    }
+                                }
                             }
                         }
 
