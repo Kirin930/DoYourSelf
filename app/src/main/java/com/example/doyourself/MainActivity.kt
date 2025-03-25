@@ -20,6 +20,8 @@ import com.example.doyourself.ui.theme.DoYourSelfTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import androidx.navigation.compose.composable
+import androidx.room.Room
+import com.example.doyourself.data.local.db.AppDatabase
 import com.example.doyourself.ui.pages.AccountScreen
 import com.example.doyourself.ui.pages.MessagesScreen
 import com.example.doyourself.ui.pages.CreateProcedureScreen
@@ -41,6 +43,14 @@ class MainActivity : ComponentActivity() {
             }*/
             val navController = rememberNavController()
             val user by rememberFirebaseUser()
+
+            val db = Room.databaseBuilder(
+                applicationContext,
+                AppDatabase::class.java,
+                "procedure_db"
+            ).build()
+
+            val dao = db.procedureDao()
 
             MaterialTheme {
                 NavHost(
