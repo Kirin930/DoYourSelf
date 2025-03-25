@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
                         MainScreen(navController)
                     }
                     composable("create") {
-                        CreateProcedureScreen(navController)
+                        CreateProcedureScreen(navController, dao)
                     }
                     composable("account") {
                         AccountScreen()

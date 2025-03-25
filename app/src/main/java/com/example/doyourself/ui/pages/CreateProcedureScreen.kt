@@ -2,6 +2,7 @@ package com.example.doyourself.ui.pages
 
 import android.net.Uri
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -26,13 +27,35 @@ import coil.compose.rememberAsyncImagePainter
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import com.example.doyourself.data.local.db.ProcedureDao
+import com.example.doyourself.data.local.entities.BlockEntity
+import com.example.doyourself.data.local.entities.ProcedureDraftEntity
+import com.example.doyourself.data.local.entities.StepEntity
+import kotlinx.coroutines.launch
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateProcedureScreen(navController: NavController) {
+fun CreateProcedureScreen(
+    navController: NavController,
+    procedureDao: ProcedureDao
+) {
     var title by remember { mutableStateOf(TextFieldValue("")) }
     val steps = remember { mutableStateListOf(ProcedureStep()) }
     val scrollState = rememberScrollState()
+
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    val draftId = remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        val newId = UUID.randomUUID().toString()
+        draftId.value = newId
+        procedureDao.insertProcedure(
+            ProcedureDraftEntity(id = newId, title = "", createdAt = System.currentTimeMillis())
+        )
+    }
 
     LaunchedEffect(steps.size) {
         scrollState.animateScrollTo(scrollState.maxValue)
@@ -47,7 +70,14 @@ fun CreateProcedureScreen(navController: NavController) {
         Text("Procedure Title", style = MaterialTheme.typography.titleMedium)
         OutlinedTextField(
             value = title,
-            onValueChange = { title = it },
+            onValueChange = {
+                title = it
+                coroutineScope.launch {
+                    procedureDao.insertProcedure(
+                        ProcedureDraftEntity(id = draftId.value, title = it.text)
+                    )
+                }
+            },
             placeholder = { Text("e.g. How to change a shower head") },
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
         )
@@ -56,7 +86,29 @@ fun CreateProcedureScreen(navController: NavController) {
             StepEditor(
                 step = step,
                 stepNumber = index + 1,
-                onAddBlock = { block -> step.blocks.add(block) },
+                onAddBlock = { block ->
+                    step.blocks.add(block)
+                    coroutineScope.launch {
+                        val stepId = step.id
+                        procedureDao.insertSteps(listOf(StepEntity(id = stepId, procedureId = draftId.value, index = index)))
+                        procedureDao.insertBlocks(step.blocks.mapIndexed { i, b ->
+                            BlockEntity(
+                                stepId = stepId,
+                                index = i,
+                                type = when (b) {
+                                    is ContentBlock.Text -> "text"
+                                    is ContentBlock.Image -> "image"
+                                    is ContentBlock.Video -> "video"
+                                },
+                                content = when (b) {
+                                    is ContentBlock.Text -> b.text
+                                    is ContentBlock.Image -> b.uri?.toString() ?: ""
+                                    is ContentBlock.Video -> b.uri?.toString() ?: ""
+                                }
+                            )
+                        })
+                    }
+                },
                 onMoveBlock = { from, to ->
                     if (from in step.blocks.indices && to in step.blocks.indices) {
                         val movedBlock = step.blocks.removeAt(from)
@@ -66,7 +118,14 @@ fun CreateProcedureScreen(navController: NavController) {
                 onRemoveBlock = { blockIndex ->
                     if (blockIndex in step.blocks.indices) step.blocks.removeAt(blockIndex)
                 },
-                onRemoveStep = { steps.remove(step) },
+                onRemoveStep = {
+                    steps.remove(step)
+                    coroutineScope.launch {
+                        procedureDao.insertSteps(steps.mapIndexed { i, s ->
+                            StepEntity(id = s.id, procedureId = draftId.value, index = i)
+                        })
+                    }
+                },
                 onMoveStepUp = {
                     if (index > 0) {
                         steps.removeAt(index).also { steps.add(index - 1, it) }
@@ -83,8 +142,19 @@ fun CreateProcedureScreen(navController: NavController) {
             )
         }
 
-        Button(onClick = { steps.add(ProcedureStep()) }) {
-            Text("Add Another Step")
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(onClick = { steps.add(ProcedureStep()) }) {
+                Text("Add Another Step")
+            }
+            Button(onClick = {
+                Toast.makeText(context, "Procedure saved locally ✅", Toast.LENGTH_SHORT).show()
+                navController.popBackStack()
+            }) {
+                Text("Save Procedure")
+            }
         }
     }
 }
@@ -188,7 +258,6 @@ fun StepEditor(
                             is ContentBlock.Video -> {
                                 val videoUri = block.uri
                                 if (videoUri != null) {
-                                    val context = LocalContext.current
                                     val exoPlayer = remember(videoUri) {
                                         ExoPlayer.Builder(context).build().apply {
                                             setMediaItem(MediaItem.fromUri(videoUri))
