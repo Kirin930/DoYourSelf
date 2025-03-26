@@ -28,6 +28,12 @@ interface ProcedureDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBlocks(blocks: List<BlockEntity>)
 
+    @Query("DELETE FROM steps WHERE id = :stepId")
+    suspend fun deleteStep(stepId: String)
+
+    @Query("DELETE FROM blocks WHERE stepId = :stepId AND `index` = :blockIndex")
+    suspend fun deleteBlockByStepAndIndex(stepId: String, blockIndex: Int)
+
     @Transaction
     @Query("SELECT * FROM procedures WHERE id = :procedureId")
     suspend fun getFullProcedure(procedureId: String): ProcedureWithStepsAndBlocks?
@@ -38,4 +44,10 @@ interface ProcedureDao {
 
     @Query("DELETE FROM procedures WHERE id = :procedureId")
     suspend fun deleteProcedure(procedureId: String)
+
+    @Query("DELETE FROM steps WHERE procedureId = :procedureId")
+    suspend fun deleteStepsByProcedureId(procedureId: String)
+
+    @Query("DELETE FROM blocks WHERE stepId IN (SELECT id FROM steps WHERE procedureId = :procedureId)")
+    suspend fun deleteBlocksByProcedureId(procedureId: String)
 }

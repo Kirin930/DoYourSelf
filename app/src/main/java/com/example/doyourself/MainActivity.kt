@@ -25,6 +25,7 @@ import com.example.doyourself.data.local.db.AppDatabase
 import com.example.doyourself.ui.pages.AccountScreen
 import com.example.doyourself.ui.pages.MessagesScreen
 import com.example.doyourself.ui.pages.CreateProcedureScreen
+import com.example.doyourself.ui.pages.DraftManagerScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -78,6 +79,13 @@ class MainActivity : ComponentActivity() {
                         val draftId = backStackEntry.arguments?.getString("draftId")
                         CreateProcedureScreen(navController, dao, draftId)
                     }
+                    composable("drafts") {
+                        DraftManagerScreen(
+                            navController = navController,
+                            procedureDao = dao
+                        )
+                    }
+
                     // Add other screens here (account, messages, etc.)
                 }
             }

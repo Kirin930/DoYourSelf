@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.material.icons.filled.Add
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,7 +32,12 @@ fun MainScreen(navController: NavHostController) {
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Create, contentDescription = "Create") },
+                    icon = { Icon(Icons.Default.Create, contentDescription = "Drafts") },
+                    selected = false,
+                    onClick = { navController.navigate("drafts") }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Add, contentDescription = "Create") },
                     selected = false,
                     onClick = { navController.navigate("create") }
                 )
