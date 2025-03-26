@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,13 +53,6 @@ fun CreateProcedureScreen(
 
     LaunchedEffect(Unit) {
         if (draftId == null) {
-            /*procedureDao.insertProcedure(
-                ProcedureDraftEntity(
-                    id = currentDraftId.value,
-                    title = "",
-                    createdAt = System.currentTimeMillis()
-                )
-            )*/
             steps.add(ProcedureStep())
         } else {
             val full = procedureDao.getFullProcedure(draftId)
@@ -104,8 +98,9 @@ fun CreateProcedureScreen(
                 onAddBlock = { block -> step.blocks.add(block) },
                 onMoveBlock = { from, to ->
                     if (from in step.blocks.indices && to in step.blocks.indices) {
-                        val movedBlock = step.blocks.removeAt(from)
-                        step.blocks.add(to, movedBlock)
+                        val moved = step.blocks.removeAt(from)
+                        step.blocks.add(to, moved)
+                        //stepVersions[step.id] = (stepVersions[step.id] ?: 0) + 1
                     }
                 },
                 onRemoveBlock = { blockIndex ->
@@ -118,9 +113,9 @@ fun CreateProcedureScreen(
                     if (index > 0) steps.removeAt(index).also { steps.add(index - 1, it) }
                 },
                 onMoveStepDown = {
-                    if (index < steps.lastIndex) steps.removeAt(index).also { steps.add(index + 1, it) }
+                    if (index < steps.lastIndex) steps.removeAt(index)
+                        .also { steps.add(index + 1, it) }
                 },
-                procedureDao = procedureDao,
                 modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp)
             )
         }
@@ -137,13 +132,10 @@ fun CreateProcedureScreen(
             }
             Button(onClick = {
                 coroutineScope.launch {
-                    //Delete procedure (in cascade delete steps and blocks)
                     procedureDao.deleteProcedure(currentDraftId.value)
-                    // Save procedure title
                     procedureDao.insertProcedure(
                         ProcedureDraftEntity(id = currentDraftId.value, title = title.text)
                     )
-                    // Save all steps and blocks
                     procedureDao.insertSteps(
                         steps.mapIndexed { i, s ->
                             StepEntity(id = s.id, procedureId = currentDraftId.value, index = i)
@@ -189,7 +181,6 @@ fun StepEditor(
     onRemoveStep: () -> Unit,
     onMoveStepUp: () -> Unit,
     onMoveStepDown: () -> Unit,
-    procedureDao: ProcedureDao,
     modifier: Modifier = Modifier
 ) {
     var collapsed by remember { mutableStateOf(false) }
@@ -312,8 +303,8 @@ fun StepEditor(
                         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                             if (i > 0) {
                                 TextButton(onClick = {
-                                    val movedBlock = step.blocks.removeAt(i)
-                                    step.blocks.add(i - 1, movedBlock)
+                                    //val movedBlock = step.blocks.removeAt(i)
+                                    //step.blocks.add(i - 1, movedBlock)
                                     onMoveBlock(i, i - 1)
                                 }) {
                                     Text("Move Up")
@@ -321,8 +312,8 @@ fun StepEditor(
                             }
                             if (i < step.blocks.lastIndex) {
                                 TextButton(onClick = {
-                                    val movedBlock = step.blocks.removeAt(i)
-                                    step.blocks.add(i + 1, movedBlock)
+                                    //val movedBlock = step.blocks.removeAt(i)
+                                    //step.blocks.add(i + 1, movedBlock)
                                     onMoveBlock(i, i + 1)
                                 }) {
                                     Text("Move Down")
@@ -356,7 +347,7 @@ fun StepEditor(
 
 data class ProcedureStep(
     val id: String = UUID.randomUUID().toString(),
-    val blocks: MutableList<ContentBlock> = mutableStateListOf()
+    var blocks: SnapshotStateList<ContentBlock> = mutableStateListOf()
 )
 
 sealed class ContentBlock {
