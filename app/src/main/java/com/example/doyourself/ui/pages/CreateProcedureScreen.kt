@@ -34,6 +34,7 @@ import com.example.doyourself.data.local.entities.ProcedureDraftEntity
 import com.example.doyourself.data.local.entities.StepEntity
 import kotlinx.coroutines.launch
 import java.util.*
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,8 +62,8 @@ fun CreateProcedureScreen(
                 val blocks = stepWithBlocks.blocks.sortedBy { it.index }.map {
                     when (it.type) {
                         "text" -> ContentBlock.Text(it.content)
-                        "image" -> ContentBlock.Image(Uri.parse(it.content))
-                        "video" -> ContentBlock.Video(Uri.parse(it.content))
+                        "image" -> ContentBlock.Image(it.content.toUri())
+                        "video" -> ContentBlock.Video(it.content.toUri())
                         else -> ContentBlock.Text("")
                     }
                 }.toMutableStateList()
