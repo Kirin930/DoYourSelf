@@ -74,6 +74,10 @@ class MainActivity : ComponentActivity() {
                     composable("messages") {
                         MessagesScreen()
                     }
+                    composable("create/{draftId}") { backStackEntry ->
+                        val draftId = backStackEntry.arguments?.getString("draftId")
+                        CreateProcedureScreen(navController, dao, draftId)
+                    }
                     // Add other screens here (account, messages, etc.)
                 }
             }
