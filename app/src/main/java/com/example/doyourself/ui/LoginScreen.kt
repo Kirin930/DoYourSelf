@@ -18,7 +18,7 @@ import android.widget.Toast
 
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
+fun LoginScreen(onLoginSuccess: () -> Unit ) {
     val context = LocalContext.current
     val activity = context as Activity
 
@@ -35,7 +35,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             FirebaseAuth.getInstance().signInWithCredential(credential)
                 .addOnCompleteListener { authResult ->
                     if (authResult.isSuccessful) {
-                        // Save user to Firestore
+                        // Save user to Firestone
                         val user = FirebaseAuth.getInstance().currentUser!!
                         val db = FirebaseFirestore.getInstance()
                         val userRef = db.collection("users").document(user.uid)

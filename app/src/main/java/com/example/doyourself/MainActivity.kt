@@ -24,7 +24,6 @@ import com.example.doyourself.ui.pages.AccountScreen
 import com.example.doyourself.ui.pages.MessagesScreen
 import com.example.doyourself.ui.pages.CreateProcedureScreen
 
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
