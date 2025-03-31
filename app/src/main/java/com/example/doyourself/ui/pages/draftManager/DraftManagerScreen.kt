@@ -1,38 +1,40 @@
-package com.example.doyourself.ui.pages
+package com.example.doyourself.ui.pages.draftManager
 
-import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.doyourself.data.local.db.ProcedureDao
 import com.example.doyourself.data.local.entities.ProcedureWithStepsAndBlocks
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import com.example.doyourself.ui.pages.draftManager.components.DraftCard
+import com.example.doyourself.ui.pages.draftManager.viewmodel.*
 
 @Composable
 fun DraftManagerScreen(
     navController: NavController,
     procedureDao: ProcedureDao
 ) {
+    //VM
+    val viewModel: DraftManagerViewModel = viewModel(
+        factory = DraftManagerViewModelFactory(procedureDao)
+    )
+
     val coroutineScope = rememberCoroutineScope()
     var drafts by remember { mutableStateOf(emptyList<ProcedureWithStepsAndBlocks>()) }
     var draftToDelete by remember { mutableStateOf<String?>(null) }
 
     // Action handlers
-    val onOpenDraft = { id: String -> openDraft(navController, id) }
-    val onDeleteDraft = { id: String -> draftToDelete = id }
-    val onPublishDraft = { id: String -> publishDraft(navController, id) }
+    val onOpenDraft = { id: String -> viewModel.openDraft(navController, id) }
+    val onDeleteDraft = { id: String -> viewModel.onDeleteDraftRequested(id) }
+    val onPublishDraft = { id: String -> viewModel.publishDraft(id) }
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -73,42 +75,7 @@ fun DraftManagerScreen(
     }
 }
 
-@Composable
-fun DraftCard(
-    draft: ProcedureWithStepsAndBlocks,
-    onOpen: () -> Unit,
-    onDelete: () -> Unit,
-    onPublish: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxSize().clickable { onOpen() }
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = draft.procedure.title.ifEmpty { "Untitled Procedure" },
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column {
-                    Text("Steps: ${draft.steps.size}", style = MaterialTheme.typography.bodySmall)
-                    Text("Created: ${draft.procedure.createdAt}", style = MaterialTheme.typography.bodySmall)
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    IconButton(onClick = onDelete) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Draft")
-                    }
-                    IconButton(onClick = onPublish) {
-                        Icon(imageVector = Icons.Default.Share, contentDescription = "Publish Draft")
-                    }
-                }
-            }
-        }
-    }
-}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

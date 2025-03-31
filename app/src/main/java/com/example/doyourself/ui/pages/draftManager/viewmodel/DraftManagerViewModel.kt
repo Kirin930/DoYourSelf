@@ -1,10 +1,11 @@
-package com.example.doyourself.ui.pages.DraftManager.viewmodel
+package com.example.doyourself.ui.pages.draftManager.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.doyourself.data.local.db.ProcedureDao
 import com.example.doyourself.data.local.entities.ProcedureWithStepsAndBlocks
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,10 +56,17 @@ class DraftManagerViewModel(
     }
 
     // If you have more logic for “publishing,” you could do it here:
-    fun publishDraft(draftId: String, onPublishComplete: () -> Unit) {
+    fun publishDraft(draftId: String/*, onPublishComplete: () -> Unit*/) {
         viewModelScope.launch {
             // TODO: Do some publish logic, e.g., network call
-            onPublishComplete()
+            //onPublishComplete()
         }
+    }
+
+    fun openDraft(
+        navController: NavController,
+        draftId: String
+    ) {
+        navController.navigate("create/$draftId")
     }
 }

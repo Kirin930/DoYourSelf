@@ -25,7 +25,7 @@ import com.example.doyourself.data.local.db.AppDatabase
 import com.example.doyourself.ui.pages.AccountScreen
 import com.example.doyourself.ui.pages.MessagesScreen
 import com.example.doyourself.ui.pages.createProcedure.CreateProcedureScreen
-import com.example.doyourself.ui.pages.DraftManagerScreen
+import com.example.doyourself.ui.pages.draftManager.DraftManagerScreen
 
 
 class MainActivity : ComponentActivity() {
