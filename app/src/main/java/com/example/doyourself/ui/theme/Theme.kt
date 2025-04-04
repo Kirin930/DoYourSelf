@@ -1,58 +1,80 @@
 package com.example.doyourself.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.example.doyourself.R
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+// Declare your custom font family once.
+val MyCustomFontFamily = FontFamily(
+    Font(R.font.redhatdisplay_variablefont_wght, FontWeight.Normal),
+    Font(R.font.redhatdisplay_bold, FontWeight.Bold),
+    Font(R.font.redhatdisplay_extrabold, FontWeight.ExtraBold)
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+// Define your typography using the custom font family.
+val AppTypography = Typography(
+    bodyLarge = TextStyle(
+        fontFamily = MyCustomFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp
+    ),
+    // We'll use labelLarge for button text styles.
+    labelLarge = TextStyle(
+        fontFamily = MyCustomFontFamily,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 20.sp
+    )
+)
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+// Warm light color scheme using warm oranges and ambers.
+private val WarmLightColorScheme = lightColorScheme(
+    primary = Color(0xFFEF6C00),    // Deep Orange
     onPrimary = Color.White,
-    onSecondary = Color.White,
+    secondary = Color(0xFFFFA726),  // Orange Accent
+    onSecondary = Color.Black,
+    tertiary = Color(0xFFFF7043),   // Warm Coral
     onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    background = Color(0xFFFFF3E0),   // Light Cream
+    onBackground = Color.Black,
+    surface = Color(0xFFFFECB3),    // Light Amber
+    onSurface = Color.Black,
+)
+
+// Warm dark color scheme for dark mode.
+private val WarmDarkColorScheme = darkColorScheme(
+    primary = Color(0xFFFFB74D),
+    onPrimary = Color.Black,
+    secondary = Color(0xFFFFA726),
+    onSecondary = Color.Black,
+    tertiary = Color(0xFFFF7043),
+    onTertiary = Color.Black,
+    background = Color(0xFF424242),
+    onBackground = Color.White,
+    surface = Color(0xFF616161),
+    onSurface = Color.White,
 )
 
 @Composable
 fun DoYourSelfTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    // Disabling dynamic color for consistency with our custom palette.
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = if (darkTheme) WarmDarkColorScheme else WarmLightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = AppTypography,
         content = content
     )
 }

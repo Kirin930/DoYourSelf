@@ -45,6 +45,12 @@ android {
     }
 }
 
+//Line necessary to enable custom fonts
+android {
+    sourceSets["main"].res.srcDirs("src/androidMain/res")
+}
+//
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
