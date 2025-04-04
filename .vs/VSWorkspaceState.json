@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\.idea",
+    "\\.kotlin",
+    "\\.kotlin\\errors",
+    "\\app"
+  ],
+  "SelectedNode": "\\app\\proguard-rules.pro",
+  "PreviewInSolutionExplorer": false
+}
