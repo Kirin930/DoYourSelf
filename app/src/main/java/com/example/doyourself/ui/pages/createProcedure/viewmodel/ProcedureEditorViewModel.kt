@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.doyourself.data.local.db.ProcedureDao
@@ -83,6 +84,11 @@ class ProcedureEditorViewModel(
     // State update methods
     // ----------------------
 
+    var procedureColor by mutableStateOf(Color(0xFF1E1E1E))
+        private set
+    fun onColorChange(c: Color) { procedureColor = c }
+
+
     fun onTitleChange(newValue: TextFieldValue) {
         title = newValue
     }
@@ -141,7 +147,8 @@ class ProcedureEditorViewModel(
                     procedureId = pid,
                     title = title.text,
                     steps = steps,
-                    procedureDao = procedureDao
+                    procedureDao = procedureDao,
+                    backgroundColor = procedureColor.toString()
                 )
                 onSuccess()
             } catch (e: Exception) {

@@ -6,18 +6,26 @@ import com.example.doyourself.data.local.entities.StepEntity
 import com.example.doyourself.data.local.entities.ProcedureDraftEntity
 import com.example.doyourself.ui.pages.createProcedure.shared.ContentBlock
 import com.example.doyourself.ui.pages.createProcedure.shared.ProcedureStep
+import java.sql.Date
+import java.sql.Time
 
 suspend fun saveProcedureToRoom(
     procedureId: String,
     title: String,
     steps: List<ProcedureStep>,
+    backgroundColor: String,
     procedureDao: ProcedureDao
 ) {
     // Delete and replace (cascade handles cleanup)
     procedureDao.deleteProcedure(procedureId)
 
     procedureDao.insertProcedure(
-        ProcedureDraftEntity(id = procedureId, title = title)
+        ProcedureDraftEntity(
+            id = procedureId,
+            title = title,
+            createdAt = Date(System.currentTimeMillis()).toString().toLong(),
+            backGroundColor = backgroundColor
+        )
     )
 
     procedureDao.insertSteps(

@@ -12,4 +12,5 @@ data class ProcedureDraftEntity(
     val isPublished: Boolean = false,
     //val firestoreId: String? = null,        // doc id in “procedures” collection
     //val storagePaths: List<String> = emptyList()  // gs://… or relative paths
+    val backGroundColor: String = "#FFFFFF"
 )

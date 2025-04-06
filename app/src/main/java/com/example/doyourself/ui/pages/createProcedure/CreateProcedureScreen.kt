@@ -7,6 +7,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -14,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.doyourself.data.local.db.ProcedureDao
 import com.example.doyourself.ui.pages.createProcedure.components.*
+import com.example.doyourself.ui.pages.createProcedure.components.topEditorBar.TopEditorBar
 import com.example.doyourself.ui.pages.createProcedure.viewmodel.ProcedureEditorViewModel
 import com.example.doyourself.ui.pages.createProcedure.viewmodel.ProcedureEditorViewModelFactory
 import kotlinx.coroutines.launch
@@ -40,8 +42,30 @@ fun CreateProcedureScreen(
 
     // 3) Observe VM state
     val title: TextFieldValue = viewModel.title
+    val procedureColor: Color = viewModel.procedureColor
     val steps = viewModel.steps  // SnapshotStateList<ProcedureStep>
 
+
+    Scaffold(
+        topBar = {
+            TopEditorBar(
+                title = viewModel.title,
+                onTitleChange = viewModel::onTitleChange,
+                selectedColor = viewModel.procedureColor,
+                onColorChange = viewModel::onColorChange,
+                onSave = { /* existing save flow */ }
+            )
+        },
+        /* floatingActionButton & bottomBar come next steps */
+    ) { innerPadding ->
+        StepsLazyColumn(
+            steps = viewModel.steps,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        )
+    }
+    /*
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -103,5 +127,5 @@ fun CreateProcedureScreen(
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             AddStepButton(onClick = { viewModel.addStep() })
         }
-    }
+    }*/
 }

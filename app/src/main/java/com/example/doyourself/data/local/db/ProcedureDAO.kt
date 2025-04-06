@@ -65,4 +65,7 @@ interface ProcedureDao {
 
     //@Query("SELECT storagePaths FROM procedures WHERE id = :procedureId")
     //suspend fun getFirestoreStorageInfo(procedureId: String): Pair<String?, List<String>>
+
+    @Query("UPDATE procedures SET backGroundColor = :backgroundColor WHERE id = :procedureId")
+    suspend fun updateProcedureBackgroundColor(procedureId: String, backgroundColor: String)
 }
