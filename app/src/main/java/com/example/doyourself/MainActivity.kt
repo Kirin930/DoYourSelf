@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.doyourself.ui.LoginScreen
-import com.example.doyourself.ui.MainScreen
+import com.example.doyourself.ui.pages.MainScreen.MainScreen
 import com.example.doyourself.ui.theme.DoYourSelfTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -26,6 +26,15 @@ import com.example.doyourself.ui.pages.AccountScreen
 import com.example.doyourself.ui.pages.MessagesScreen
 import com.example.doyourself.ui.pages.createProcedure.CreateProcedureScreen
 import com.example.doyourself.ui.pages.draftManager.DraftManagerScreen
+import com.example.doyourself.ui.pages.previewProcedure.PreviewScreen
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.appCheck
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
+import com.google.firebase.initialize
+
 
 
 class MainActivity : ComponentActivity() {
@@ -52,6 +61,16 @@ class MainActivity : ComponentActivity() {
             ).build()
 
             val dao = db.procedureDao()
+
+            Firebase.initialize(context = this)
+            Firebase.appCheck.installAppCheckProviderFactory(
+                PlayIntegrityAppCheckProviderFactory.getInstance(),
+            )
+
+            FirebaseApp.initializeApp(this)
+            val providerFactory = DebugAppCheckProviderFactory.getInstance()
+            FirebaseAppCheck.getInstance().installAppCheckProviderFactory(providerFactory)
+
 
             MaterialTheme {
                 NavHost(
@@ -83,6 +102,14 @@ class MainActivity : ComponentActivity() {
                         DraftManagerScreen(
                             navController = navController,
                             procedureDao = dao
+                        )
+                    }
+                    composable("preview/{draftId}") { backStackEntry ->
+                        val draftId = backStackEntry.arguments?.getString("draftId") ?: return@composable
+                        PreviewScreen(
+                            navController = navController,
+                            procedureDao = dao,
+                            draftId = draftId
                         )
                     }
 

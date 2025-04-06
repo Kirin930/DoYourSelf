@@ -50,4 +50,19 @@ interface ProcedureDao {
 
     @Query("DELETE FROM blocks WHERE stepId IN (SELECT id FROM steps WHERE procedureId = :procedureId)")
     suspend fun deleteBlocksByProcedureId(procedureId: String)
+
+    @Query("UPDATE procedures SET isPublished = :isPublished WHERE id = :procedureId")
+    suspend fun updateProcedurePublishedStatus(procedureId: String, isPublished: Boolean)
+
+    @Query("SELECT * FROM procedures WHERE isPublished = 1")
+    suspend fun getPublishedProcedures(): List<ProcedureWithStepsAndBlocks>
+
+    //@Query("UPDATE procedures SET firestoreId = :firestoreId WHERE id = :procedureId")
+    //suspend fun setFirestoreId(procedureId: String, firestoreId: String)
+
+    //@Query("UPDATE procedures SET storagePaths = :storagePaths WHERE id = :procedureId")
+    //suspend fun setStoragePaths(procedureId: String, storagePaths: List<String>)
+
+    //@Query("SELECT storagePaths FROM procedures WHERE id = :procedureId")
+    //suspend fun getFirestoreStorageInfo(procedureId: String): Pair<String?, List<String>>
 }

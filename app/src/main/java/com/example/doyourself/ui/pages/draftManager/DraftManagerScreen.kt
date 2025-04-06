@@ -14,7 +14,7 @@ import com.example.doyourself.data.local.entities.ProcedureWithStepsAndBlocks
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import com.example.doyourself.ui.pages.draftManager.components.DraftCard
+import com.example.doyourself.ui.pages.draftManager.components.*
 import com.example.doyourself.ui.pages.draftManager.viewmodel.*
 
 @Composable
@@ -27,59 +27,86 @@ fun DraftManagerScreen(
         factory = DraftManagerViewModelFactory(procedureDao)
     )
 
-    val coroutineScope = rememberCoroutineScope()
-    var drafts by remember { mutableStateOf(emptyList<ProcedureWithStepsAndBlocks>()) }
-    var draftToDelete by remember { mutableStateOf<String?>(null) }
+    val drafts by viewModel.drafts.collectAsState()
+    val draftToDelete = viewModel.draftToDelete
 
-    // Action handlers
-    val onOpenDraft = { id: String -> viewModel.openDraft(navController, id) }
-    val onDeleteDraft = { id: String -> viewModel.onDeleteDraftRequested(id) }
-    val onPublishDraft = { id: String -> viewModel.publishDraft(id) }
+    val procedures by viewModel.procedures.collectAsState()
+    val procedureToDelete = viewModel.procedureToDelete
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            procedureDao.getAllDrafts().collectLatest {
-                drafts = it
-            }
-        }
-    }
+    var selectedTab by remember { mutableStateOf(0) }
+    val tabTitles = listOf("Published", "Drafts")
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("My Drafts", style = MaterialTheme.typography.headlineMedium)
+        Text("My Procedures", style = MaterialTheme.typography.headlineMedium)
+
         Spacer(modifier = Modifier.height(16.dp))
 
+        //Tab Row (too choose with tab we have to show
+        TabRow(selectedTabIndex = selectedTab) {
+            tabTitles.forEachIndexed { index, title ->
+                Tab(
+                    selected = (selectedTab == index),
+                    onClick = { selectedTab = index },
+                    text = { Text(title) }
+                )
+            }
+        }
+
+        // 2) Show content based on selectedTab
+        when (selectedTab) {
+            0 ->  LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(procedures) { procedure ->
+                    ProcedureCard(
+                        procedure = procedure,
+                        onDelete = { viewModel.onDeleteProcedureRequested(procedure.procedure.id) }
+                    )
+                }
+            }
+            1 -> LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(drafts) { draft ->
+                    DraftCard(
+                        draft = draft,
+                        onOpen = { viewModel.openDraft(navController, draft.procedure.id) },
+                        onDelete = { viewModel.onDeleteDraftRequested(draft.procedure.id) },
+                        onPublish = { viewModel.publishDraft(navController, draft.procedure.id) }
+                    )
+                }
+            }
+        }
+
+
+        /*
         LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             items(drafts) { draft ->
                 DraftCard(
                     draft = draft,
-                    onOpen = { onOpenDraft(draft.procedure.id) },
-                    onDelete = { onDeleteDraft(draft.procedure.id) },
-                    onPublish = { onPublishDraft(draft.procedure.id) }
+                    onOpen = { viewModel.openDraft(navController, draft.procedure.id) },
+                    onDelete = { viewModel.onDeleteDraftRequested(draft.procedure.id) },
+                    onPublish = { viewModel.publishDraft(navController, draft.procedure.id) }
                 )
             }
-        }
+        }*/
     }
 
     draftToDelete?.let { draftId ->
-        ConfirmDeleteDialog(
-            onConfirm = {
-                deleteDraft(
-                    coroutineScope = coroutineScope,
-                    procedureDao = procedureDao,
-                    draftId = draftId,
-                    onComplete = { draftToDelete = null }
-                )
-            },
-            onDismiss = { draftToDelete = null }
+        ConfirmDraftDeleteDialog(
+            onConfirm = { viewModel.confirmDeleteDraft() },
+            onDismiss = { viewModel.dismissDeleteDraft() }
+        )
+    }
+
+    procedureToDelete?.let { procedureId ->
+        ConfirmProcedureDeleteDialog(
+            onConfirm = { viewModel.confirmDeleteProcedure() },
+            onDismiss = { viewModel.dismissDeleteProcedure() }
         )
     }
 }
 
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConfirmDeleteDialog(
+fun ConfirmDraftDeleteDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -100,28 +127,25 @@ fun ConfirmDeleteDialog(
     )
 }
 
-fun openDraft(
-    navController: NavController,
-    draftId: String
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ConfirmProcedureDeleteDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
 ) {
-    navController.navigate("create/$draftId")
-}
-
-fun deleteDraft(
-    coroutineScope: CoroutineScope,
-    procedureDao: ProcedureDao,
-    draftId: String,
-    onComplete: () -> Unit
-) {
-    coroutineScope.launch {
-        procedureDao.deleteProcedure(draftId)
-        onComplete()
-    }
-}
-
-fun publishDraft(
-    navController: NavController,
-    draftId: String
-) {
-    // TODO: Implement publish logic
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Delete Procedure") },
+        text = { Text("Are you sure you want to delete this procedure? This will delete it also from the cloud!") },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Delete")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }

@@ -8,10 +8,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.doyourself.data.local.db.ProcedureDao
 import com.example.doyourself.data.local.entities.ProcedureWithStepsAndBlocks
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class DraftManagerViewModel(
     private val procedureDao: ProcedureDao
@@ -21,15 +26,32 @@ class DraftManagerViewModel(
     private val _drafts = MutableStateFlow<List<ProcedureWithStepsAndBlocks>>(emptyList())
     val drafts: StateFlow<List<ProcedureWithStepsAndBlocks>> = _drafts
 
+    private val _procedures = MutableStateFlow<List<ProcedureWithStepsAndBlocks>>(emptyList())
+    val procedures: StateFlow<List<ProcedureWithStepsAndBlocks>> = _procedures
+
     // Holds the ID of the draft the user wants to delete
     var draftToDelete by mutableStateOf<String?>(null)
+        private set
+
+    // Holds the ID of the draft the user wants to delete
+    var procedureToDelete by mutableStateOf<String?>(null)
         private set
 
     init {
         // Load the drafts as soon as the ViewModel is created
         viewModelScope.launch {
             procedureDao.getAllDrafts().collectLatest { list ->
-                _drafts.value = list
+                _procedures.value = list.filter { it.procedure.isPublished }
+                _drafts.value     = list.filter { !it.procedure.isPublished }
+
+                //_drafts.value = list
+                /*for (draft in list) {
+                    if (draft.procedure.isPublished) {
+                        _procedures.value += draft
+                    } else {
+                        _drafts.value += draft
+                    }
+                }*/
             }
         }
     }
@@ -55,12 +77,12 @@ class DraftManagerViewModel(
         draftToDelete = null
     }
 
-    // If you have more logic for “publishing,” you could do it here:
-    fun publishDraft(draftId: String/*, onPublishComplete: () -> Unit*/) {
-        viewModelScope.launch {
-            // TODO: Do some publish logic, e.g., network call
-            //onPublishComplete()
-        }
+    // If you have more logic for “preview before publishing” you could do it here:
+    fun publishDraft(
+        navController: NavController,
+        draftId: String
+    ) {
+        navController.navigate("preview/$draftId")
     }
 
     fun openDraft(
@@ -69,4 +91,46 @@ class DraftManagerViewModel(
     ) {
         navController.navigate("create/$draftId")
     }
+
+
+    // Called when the user taps Delete on a Procedure
+    fun onDeleteProcedureRequested(draftId: String) {
+        procedureToDelete = draftId
+    }
+
+    // Actually deletes the procedure and resets procedureToDelete
+    fun confirmDeleteProcedure() {
+        procedureToDelete?.let { id ->
+            viewModelScope.launch {
+                deletePublishedProcedure(
+                    procedureId = id,
+                    dao = procedureDao
+                )
+
+                // Clear it once done
+                procedureToDelete = null
+            }
+        }
+    }
+
+    // Called when the user closes the dialog
+    fun dismissDeleteProcedure() {
+        procedureToDelete = null
+    }
+
+    suspend fun deletePublishedProcedure(
+        procedureId: String,            // == firestoreId
+        dao: ProcedureDao
+    ) {
+        // 1. Remove the Firestore doc → triggers the Cloud Function
+        FirebaseFirestore.getInstance()
+            .collection("publishedProcedures")
+            .document(procedureId)
+            .delete()
+            .await()
+
+        // 2. Update local DB
+        dao.deleteProcedure(procedureId)           // or mark isPublished = false
+    }
+
 }
