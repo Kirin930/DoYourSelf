@@ -1,4 +1,4 @@
-package com.example.doyourself.ui.pages.createProcedure.components.topEditorBar
+package com.example.doyourself.ui.pages.createProcedure.components.topBar
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.BorderStroke

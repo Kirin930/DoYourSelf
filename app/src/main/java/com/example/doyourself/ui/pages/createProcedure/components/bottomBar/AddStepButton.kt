@@ -1,7 +1,8 @@
-package com.example.doyourself.ui.pages.createProcedure.components
+package com.example.doyourself.ui.pages.createProcedure.components.bottomBar
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.doyourself.ui.pages.createProcedure.components.TextButtonTemplate
 import com.example.doyourself.ui.theme.DoYourSelfTheme
 
 @Preview(showBackground = true)

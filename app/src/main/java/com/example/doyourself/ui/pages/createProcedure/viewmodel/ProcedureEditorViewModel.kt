@@ -84,7 +84,7 @@ class ProcedureEditorViewModel(
     // State update methods
     // ----------------------
 
-    var procedureColor by mutableStateOf(Color(0xFF1E1E1E))
+    var procedureColor by mutableStateOf(Color(0xFFFFFFFF))
         private set
     fun onColorChange(c: Color) { procedureColor = c }
 

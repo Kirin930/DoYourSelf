@@ -1,9 +1,7 @@
 package com.example.doyourself.ui.pages.createProcedure
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -15,10 +13,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.doyourself.data.local.db.ProcedureDao
 import com.example.doyourself.ui.pages.createProcedure.components.*
-import com.example.doyourself.ui.pages.createProcedure.components.topEditorBar.TopEditorBar
+import com.example.doyourself.ui.pages.createProcedure.components.bottomBar.BottomEditorBar
+import com.example.doyourself.ui.pages.createProcedure.components.topBar.TopEditorBar
 import com.example.doyourself.ui.pages.createProcedure.viewmodel.ProcedureEditorViewModel
 import com.example.doyourself.ui.pages.createProcedure.viewmodel.ProcedureEditorViewModelFactory
-import kotlinx.coroutines.launch
 
 @Composable
 fun CreateProcedureScreen(
@@ -45,7 +43,6 @@ fun CreateProcedureScreen(
     val procedureColor: Color = viewModel.procedureColor
     val steps = viewModel.steps  // SnapshotStateList<ProcedureStep>
 
-
     Scaffold(
         topBar = {
             TopEditorBar(
@@ -56,6 +53,9 @@ fun CreateProcedureScreen(
                 onSave = { /* existing save flow */ }
             )
         },
+        bottomBar = {
+            BottomEditorBar(onAddStep = viewModel::addStep)
+        }
         /* floatingActionButton & bottomBar come next steps */
     ) { innerPadding ->
         StepsLazyColumn(
