@@ -1,12 +1,18 @@
 package com.example.doyourself.ui.pages.createProcedure.components
 
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.doyourself.ui.theme.DoYourSelfTheme
+
+@Preview(showBackground = true)
+@Composable
+fun AddStepButtonPreview() {
+    DoYourSelfTheme {
+        AddStepButton { }
+    }
+}
 
 @Composable
-fun AddStepButton(onClick: () -> Unit) {
-    Button(onClick = onClick) {
-        Text("Add Step")
-    }
+fun AddStepButton(onClick: () -> Unit = {}) {
+    TextButtonTemplate(text = "Add Step", onClick = onClick)
 }
