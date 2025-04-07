@@ -1,4 +1,4 @@
-package com.example.doyourself.ui.pages.createProcedure.components
+package com.example.doyourself.ui.pages.createProcedure.components.stepList.step.blocks
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.doyourself.ui.pages.createProcedure.shared.ContentBlock

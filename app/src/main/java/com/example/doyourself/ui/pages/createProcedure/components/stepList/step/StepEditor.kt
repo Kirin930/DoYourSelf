@@ -1,4 +1,4 @@
-package com.example.doyourself.ui.pages.createProcedure.components
+package com.example.doyourself.ui.pages.createProcedure.components.stepList.step
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -7,6 +7,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.doyourself.ui.pages.createProcedure.components.stepList.step.blocks.ImageBlock
+import com.example.doyourself.ui.pages.createProcedure.components.stepList.step.blocks.TextBlock
+import com.example.doyourself.ui.pages.createProcedure.components.stepList.step.blocks.TitleBlock
+import com.example.doyourself.ui.pages.createProcedure.components.stepList.step.blocks.VideoBlock
 import com.example.doyourself.ui.pages.createProcedure.shared.ContentBlock
 import com.example.doyourself.ui.pages.createProcedure.shared.ProcedureStep
 import com.example.doyourself.ui.pages.createProcedure.logic.*
@@ -30,6 +34,9 @@ fun StepEditor(
             when (block) {
                 is ContentBlock.Text -> TextBlock(block) {
                     step.blocks[i] = ContentBlock.Text(it)
+                }
+                is ContentBlock.Title -> TitleBlock(block) {
+                    step.blocks[i] = ContentBlock.Title(it)
                 }
                 is ContentBlock.Image -> ImageBlock(block) {
                     step.blocks[i] = ContentBlock.Image(it)

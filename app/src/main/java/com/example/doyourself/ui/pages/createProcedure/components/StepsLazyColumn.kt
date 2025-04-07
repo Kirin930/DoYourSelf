@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.doyourself.ui.pages.createProcedure.components.stepList.step.StepEditor
 import com.example.doyourself.ui.pages.createProcedure.shared.ProcedureStep
-import com.example.doyourself.ui.pages.createProcedure.shared.ContentBlock
 import com.example.doyourself.ui.pages.createProcedure.logic.*
 
 @Composable

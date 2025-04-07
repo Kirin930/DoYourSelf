@@ -67,6 +67,7 @@ class ProcedureEditorViewModel(
                                 .map {
                                     when (it.type) {
                                         "text" -> ContentBlock.Text(it.content)
+                                        "title" -> ContentBlock.Title(it.content)
                                         "image" -> ContentBlock.Image(it.content.toUri())
                                         "video" -> ContentBlock.Video(it.content.toUri())
                                         else -> ContentBlock.Text("")

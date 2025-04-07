@@ -42,11 +42,13 @@ suspend fun saveProcedureToRoom(
                     index = i,
                     type = when (b) {
                         is ContentBlock.Text -> "text"
+                        is ContentBlock.Title -> "title"
                         is ContentBlock.Image -> "image"
                         is ContentBlock.Video -> "video"
                     },
                     content = when (b) {
                         is ContentBlock.Text -> b.text
+                        is ContentBlock.Title -> b.text
                         is ContentBlock.Image -> b.uri?.toString() ?: ""
                         is ContentBlock.Video -> b.uri?.toString() ?: ""
                     }

@@ -78,6 +78,13 @@ class PreviewViewModel(
                                     "content" to blockContent
                                 )
                             }
+                            "title" -> {
+                                // title block => store text directly
+                                mapOf(
+                                    "type" to "title",
+                                    "content" to blockContent
+                                )
+                            }
                             "image" -> {
                                 // Upload the local image to Storage if not empty
                                 val localUri = blockContent.takeIf { it.isNotEmpty() }

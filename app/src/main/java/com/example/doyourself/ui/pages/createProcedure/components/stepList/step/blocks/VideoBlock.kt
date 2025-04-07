@@ -1,4 +1,4 @@
-package com.example.doyourself.ui.pages.createProcedure.components
+package com.example.doyourself.ui.pages.createProcedure.components.stepList.step.blocks
 
 import android.net.Uri
 import android.widget.FrameLayout
