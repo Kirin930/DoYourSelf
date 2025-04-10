@@ -1,6 +1,7 @@
 [versions]
 accompanistReorderable = "0.26.2-beta"
 agp = "8.9.1"
+composeReorderable = "0.9.0"
 kotlin = "2.0.21"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -13,6 +14,7 @@ composeBom = "2025.03.01"
 [libraries]
 accompanist-reorderable = { module = "com.google.accompanist:accompanist-reorderable", version.ref = "accompanistReorderable" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+compose-reorderable = { module = "com.github.aclassen:compose-reorderable", version.ref = "composeReorderable" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

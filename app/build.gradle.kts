@@ -107,6 +107,6 @@ dependencies {
 
     implementation("com.google.firebase:firebase-appcheck-debug")
 
-    implementation("com.github.aclassen:compose-reorderable:0.9.0")
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
 }

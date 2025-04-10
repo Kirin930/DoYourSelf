@@ -6,8 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.google.accompanist.DRA
-import com.google.accompanist.reorderable.reorderableItem
+import org.burnoutcrew.reorderable.ReorderableLazyListState
+import org.burnoutcrew.reorderable.reorderable
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -23,7 +24,7 @@ fun DraggableBlockItem(
     Box(
         modifier = Modifier
             // First, enable reordering on the item.
-            .reorderableItem(reorderState, key = key)
+            .reorderable(reorderState)
             // Then, add a combinedClickable that listens for long presses.
             .combinedClickable(
                 onClick = { /* Could select the block, etc. */ },
