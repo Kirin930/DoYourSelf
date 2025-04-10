@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.example.doyourself.ui.pages.createProcedure.components.SaveProcedureButton
 
 @Composable
 fun TopEditorBar(

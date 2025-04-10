@@ -1,4 +1,4 @@
-package com.example.doyourself.ui.pages.createProcedure.components.stepList.step
+package com.example.doyourself.ui.pages.createProcedure.components.stepList.steps
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add

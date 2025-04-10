@@ -1,10 +1,13 @@
 package com.example.doyourself.ui.pages.createProcedure.shared
 
 import android.net.Uri
+import java.util.UUID
 
 sealed class ContentBlock {
-    data class Text(val text: String) : ContentBlock()
-    data class Title(val text: String) : ContentBlock()
-    data class Image(val uri: Uri?) : ContentBlock()
-    data class Video(val uri: Uri?) : ContentBlock()
+    abstract val id: String // Unique identifier for each block
+
+    data class Text(var text: String, override val id: String = UUID.randomUUID().toString()) : ContentBlock()
+    data class Title(var text: String, override val id: String = UUID.randomUUID().toString()) : ContentBlock()
+    data class Image(var uri: Uri? = null, override val id: String = UUID.randomUUID().toString()) : ContentBlock()
+    data class Video(var uri: Uri? = null, override val id: String = UUID.randomUUID().toString()) : ContentBlock()
 }

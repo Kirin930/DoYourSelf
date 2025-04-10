@@ -1,4 +1,4 @@
-package com.example.doyourself.ui.pages.createProcedure.components.stepList.step
+package com.example.doyourself.ui.pages.createProcedure.components.stepList.steps
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable

@@ -1,4 +1,4 @@
-package com.example.doyourself.ui.pages.createProcedure.components.stepList.step.blocks
+package com.example.doyourself.ui.pages.createProcedure.components.stepList.steps.blocks
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult

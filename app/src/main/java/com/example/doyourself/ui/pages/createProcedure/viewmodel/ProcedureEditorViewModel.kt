@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
@@ -28,9 +29,11 @@ class ProcedureEditorViewModel(
     var title by mutableStateOf(TextFieldValue(""))
         private set
 
-    // In Compose, a SnapshotStateList is a convenient mutable list type.
-    // The UI can observe changes automatically.
-    val steps = mutableStateListOf<ProcedureStep>()
+    var procedureColor by mutableStateOf(Color(0xFFFFFFFF))
+        private set
+
+    // Steps list: each step is a ProcedureStep.
+    val steps: SnapshotStateList<ProcedureStep> = mutableStateListOf()
 
     // Current draft ID (or newly generated if none is provided)
     var currentDraftId: String? by mutableStateOf(null)
@@ -85,36 +88,47 @@ class ProcedureEditorViewModel(
     // State update methods
     // ----------------------
 
-    var procedureColor by mutableStateOf(Color(0xFFFFFFFF))
-        private set
-    fun onColorChange(c: Color) { procedureColor = c }
 
+    fun onColorChange(newColor: Color) {
+        procedureColor = newColor
+    }
 
     fun onTitleChange(newValue: TextFieldValue) {
         title = newValue
     }
 
+    // --- Step management ---
+
     fun addStep() {
-        steps.add(ProcedureStep())
+        // When a new step is added, automatically insert a TitleBlock and a TextBlock.
+        val newStep = ProcedureStep(
+            blocks = mutableStateListOf(
+                ContentBlock.Title(text = "Step Title"),
+                ContentBlock.Text(text = "Step description")
+            )
+        )
+        steps.add(newStep)
     }
 
     fun deleteStep(step: ProcedureStep) {
         steps.remove(step)
     }
 
-    fun moveStepUp(index: Int) {
-        if (index <= 0) return
-        val step = steps.removeAt(index)
-        steps.add(index - 1, step)
+    fun moveStepLeft(currentIndex: Int) {
+        if (currentIndex > 0 && currentIndex < steps.size) {
+            steps.add(currentIndex - 1, steps.removeAt(currentIndex))
+        }
+    }
+    fun moveStepRight(currentIndex: Int) {
+        if (currentIndex < steps.size - 1) {
+            steps.add(currentIndex + 1, steps.removeAt(currentIndex))
+        }
     }
 
-    fun moveStepDown(index: Int) {
-        if (index >= steps.lastIndex) return
-        val step = steps.removeAt(index)
-        steps.add(index + 1, step)
-    }
 
-    // For blocks:
+
+    // --- Block management for a given step ---
+
     fun addBlock(step: ProcedureStep, block: ContentBlock) {
         step.blocks.add(block)
     }
@@ -125,10 +139,23 @@ class ProcedureEditorViewModel(
         }
     }
 
-    fun moveBlock(step: ProcedureStep, from: Int, to: Int) {
-        if (from in step.blocks.indices && to in step.blocks.indices) {
-            val moved = step.blocks.removeAt(from)
-            step.blocks.add(to, moved)
+    fun duplicateBlock(step: ProcedureStep, blockIndex: Int) {
+        if (blockIndex in step.blocks.indices) {
+            val original = step.blocks[blockIndex]
+            val duplicate = when (original) {
+                is ContentBlock.Title -> original.copy(id = UUID.randomUUID().toString())
+                is ContentBlock.Text -> original.copy(id = UUID.randomUUID().toString())
+                is ContentBlock.Image -> original.copy(id = UUID.randomUUID().toString())
+                is ContentBlock.Video -> original.copy(id = UUID.randomUUID().toString())
+            }
+            // Insert the duplicate right after the original.
+            step.blocks.add(blockIndex + 1, duplicate)
+        }
+    }
+
+    fun moveBlock(step: ProcedureStep, fromIndex: Int, toIndex: Int) {
+        if (fromIndex in step.blocks.indices && toIndex in 0..step.blocks.size) {
+            step.blocks.add(toIndex, step.blocks.removeAt(fromIndex))
         }
     }
 

@@ -1,4 +1,4 @@
-package com.example.doyourself.ui.pages.createProcedure.components.stepList.step.blocks
+package com.example.doyourself.ui.pages.createProcedure.components.stepList.steps.blocks
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.OutlinedTextField
