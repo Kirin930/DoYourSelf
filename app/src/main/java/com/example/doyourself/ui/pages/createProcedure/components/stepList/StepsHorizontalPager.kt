@@ -31,6 +31,7 @@ fun StepsHorizontalPager(
     HorizontalPager(
         state = pagerState,
         key = { page -> steps[page].id },
+        userScrollEnabled = false, // Disable horizontal scroll temporarily for testing.
         modifier = modifier.fillMaxSize()
     ) { page ->
         // Each page shows one StepEditor.

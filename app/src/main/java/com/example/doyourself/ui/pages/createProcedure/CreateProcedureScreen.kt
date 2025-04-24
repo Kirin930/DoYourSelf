@@ -56,6 +56,9 @@ fun CreateProcedureScreen(
         pageCount = { viewModel.steps.size }
     )
 
+    // State controlling whether the "Add Block" menu is visible.
+    var showAddMenu by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopEditorBar(
@@ -78,6 +81,7 @@ fun CreateProcedureScreen(
                 // For now, for simplicity, add a default Text Block to current step.
                 val currentStep = steps.getOrNull(pagerState.currentPage)
                 if (currentStep != null) {
+
                     viewModel.addBlock(currentStep, com.example.doyourself.ui.pages.createProcedure.shared.ContentBlock.Text("", java.util.UUID.randomUUID().toString()))
                 }
             }) {
