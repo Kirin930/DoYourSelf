@@ -58,10 +58,12 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                         }
                     } else {
                         loading = false
+                        Toast.makeText(context, "Authentication failed: ${authResult.exception?.localizedMessage}", Toast.LENGTH_LONG).show()
                     }
                 }
         } catch (e: Exception) {
             loading = false
+            Toast.makeText(context, "Google sign-in failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             e.printStackTrace()
         }
     }
