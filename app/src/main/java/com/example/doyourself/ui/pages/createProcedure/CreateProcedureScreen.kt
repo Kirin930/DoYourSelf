@@ -24,6 +24,10 @@ import com.example.doyourself.ui.pages.createProcedure.components.topBar.TopEdit
 import com.example.doyourself.ui.pages.createProcedure.viewmodel.ProcedureEditorViewModel
 import com.example.doyourself.ui.pages.createProcedure.viewmodel.ProcedureEditorViewModelFactory
 import kotlinx.coroutines.launch
+import androidx.activity.compose.BackHandler
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+
 
 @Composable
 fun CreateProcedureScreen(
@@ -31,16 +35,19 @@ fun CreateProcedureScreen(
     procedureDao: ProcedureDao,
     draftId: String? = null
 ) {
+    // Disable system back button on this screen
+    BackHandler(enabled = true) { /* no-op to block back navigation */ }
     // 1) Obtain our VM instance
     val viewModel: ProcedureEditorViewModel = viewModel(
-        factory = ProcedureEditorViewModelFactory(procedureDao)
+        factory = ProcedureEditorViewModelFactory(procedureDao, navController)
     )
 
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-
+    // Snackbar state for error messages
+    val snackbarHostState = remember { SnackbarHostState() }
     // 2) Load data if needed. (Load once)
     LaunchedEffect(draftId) {
         viewModel.loadProcedure(draftId)
@@ -68,12 +75,22 @@ fun CreateProcedureScreen(
                 onColorChange = viewModel::onColorChange,
                 onSave = {
                     viewModel.saveProcedure(
-                        onSuccess = { navController.popBackStack() },
-                        onError = { /* handle error */ }
+                        onSuccess = {
+                            // Navigate and remove this screen from back stack
+                            navController.navigate("draftManager") {
+                                popUpTo("CreateProcedureScreen") { inclusive = true }
+                            }
+                        },
+                        onError = { error ->
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Error saving: ${error.localizedMessage}")
+                            }
+                        }
                     )
                 }
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
             // FloatingActionButton for adding a new Block to the current step.
             FloatingActionButton(onClick = {

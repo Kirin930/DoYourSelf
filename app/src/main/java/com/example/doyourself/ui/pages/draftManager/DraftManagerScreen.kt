@@ -33,7 +33,7 @@ fun DraftManagerScreen(
     val procedures by viewModel.procedures.collectAsState()
     val procedureToDelete = viewModel.procedureToDelete
 
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by remember { mutableIntStateOf(0) }
     val tabTitles = listOf("Published", "Drafts")
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {

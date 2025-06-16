@@ -1,6 +1,6 @@
 [versions]
 accompanistReorderable = "0.26.2-beta"
-agp = "8.9.1"
+agp = "8.10.1"
 composeReorderable = "0.9.0"
 kotlin = "2.0.21"
 coreKtx = "1.15.0"

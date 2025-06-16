@@ -20,9 +20,11 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.net.toUri
+import androidx.navigation.NavController
 
 class ProcedureEditorViewModel(
-    private val procedureDao: ProcedureDao
+    private val procedureDao: ProcedureDao,
+    private val navController: NavController
 ) : ViewModel() {
 
     // Title state
@@ -176,9 +178,11 @@ class ProcedureEditorViewModel(
                     title = title.text,
                     steps = steps,
                     procedureDao = procedureDao,
-                    backgroundColor = procedureColor.toString()
+                    backgroundColor = procedureColor.toString(),
+                    navController = navController
                 )
                 onSuccess()
+                navController.navigate("draftManager")
             } catch (e: Exception) {
                 onError(e)
             }

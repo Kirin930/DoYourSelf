@@ -1,5 +1,6 @@
 package com.example.doyourself.ui.pages.createProcedure.logic
 
+import androidx.navigation.NavController
 import com.example.doyourself.data.local.db.ProcedureDao
 import com.example.doyourself.data.local.entities.BlockEntity
 import com.example.doyourself.data.local.entities.StepEntity
@@ -14,7 +15,8 @@ suspend fun saveProcedureToRoom(
     title: String,
     steps: List<ProcedureStep>,
     backgroundColor: String,
-    procedureDao: ProcedureDao
+    procedureDao: ProcedureDao,
+    navController: NavController
 ) {
     // Delete and replace (cascade handles cleanup)
     procedureDao.deleteProcedure(procedureId)
@@ -56,4 +58,6 @@ suspend fun saveProcedureToRoom(
             }
         )
     }
+
+
 }
