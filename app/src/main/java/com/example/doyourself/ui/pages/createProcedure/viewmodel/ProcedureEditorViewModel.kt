@@ -4,6 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
@@ -21,10 +23,11 @@ import java.util.UUID
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.net.toUri
 import androidx.navigation.NavController
+import com.example.doyourself.data.local.entities.ProcedureWithStepsAndBlocks
+import com.example.doyourself.ui.pages.createProcedure.shared.ProcedureStepList
 
 class ProcedureEditorViewModel(
-    private val procedureDao: ProcedureDao,
-    private val navController: NavController
+    private val procedureDao: ProcedureDao
 ) : ViewModel() {
 
     // Title state
@@ -40,6 +43,8 @@ class ProcedureEditorViewModel(
     // Current draft ID (or newly generated if none is provided)
     var currentDraftId: String? by mutableStateOf(null)
         private set
+
+    var currentStepIndex by mutableStateOf(0)
 
     /**
      * Public method to initialize the ViewModel
@@ -110,10 +115,12 @@ class ProcedureEditorViewModel(
             )
         )
         steps.add(newStep)
+        currentStepIndex = steps.lastIndex
     }
 
     fun deleteStep(step: ProcedureStep) {
         steps.remove(step)
+        currentStepIndex = steps.lastIndex
     }
 
     fun moveStepLeft(currentIndex: Int) {
@@ -124,6 +131,34 @@ class ProcedureEditorViewModel(
     fun moveStepRight(currentIndex: Int) {
         if (currentIndex < steps.size - 1) {
             steps.add(currentIndex + 1, steps.removeAt(currentIndex))
+        }
+    }
+
+    fun moveStep(stepList: ProcedureStepList, fromIndex: Int, toIndex: Int) {
+        if (fromIndex in stepList.steps.indices && toIndex in 0..stepList.steps.size) {
+            stepList.steps.add(toIndex, stepList.steps.removeAt(fromIndex))
+            currentStepIndex = toIndex
+        }
+    }
+
+    fun duplicateStep(stepIndex: Int) {
+        if (stepIndex in steps.indices) {
+            val originalStep = steps[stepIndex]
+
+            // Duplicate each block using the existing duplicateBlock logic
+            val newBlocks = mutableStateListOf<ContentBlock>()
+            for (block in originalStep.blocks) {
+                val duplicate = when (block) {
+                    is ContentBlock.Title -> block.copy(id = UUID.randomUUID().toString())
+                    is ContentBlock.Text -> block.copy(id = UUID.randomUUID().toString())
+                    is ContentBlock.Image -> block.copy(id = UUID.randomUUID().toString())
+                    is ContentBlock.Video -> block.copy(id = UUID.randomUUID().toString())
+                }
+                newBlocks.add(duplicate)
+            }
+            val newStep = ProcedureStep(blocks = newBlocks)
+            steps.add(stepIndex + 1, newStep)
+            currentStepIndex = stepIndex + 1
         }
     }
 
@@ -166,6 +201,7 @@ class ProcedureEditorViewModel(
     // ----------------------
 
     fun saveProcedure(
+        navController: NavController,
         onSuccess: () -> Unit,
         onError: (Throwable) -> Unit
     ) {
@@ -178,11 +214,9 @@ class ProcedureEditorViewModel(
                     title = title.text,
                     steps = steps,
                     procedureDao = procedureDao,
-                    backgroundColor = procedureColor.toString(),
-                    navController = navController
+                    backgroundColor = procedureColor.toString()
                 )
                 onSuccess()
-                navController.navigate("draftManager")
             } catch (e: Exception) {
                 onError(e)
             }

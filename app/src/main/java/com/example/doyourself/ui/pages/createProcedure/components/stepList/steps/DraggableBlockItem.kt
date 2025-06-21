@@ -47,18 +47,6 @@ fun DraggableBlockItem(
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        /*Box(
-            modifier = Modifier
-                .detectReorderAfterLongPress(reorderState)
-                .size(40.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Drag to reorder"
-            )
-        }
-        Spacer(modifier = Modifier.width(8.dp))*/
         // Display the actual block content.
         Box(modifier = Modifier.weight(1f)) {
             content()

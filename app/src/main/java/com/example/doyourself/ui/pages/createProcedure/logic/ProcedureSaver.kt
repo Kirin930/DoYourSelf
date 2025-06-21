@@ -9,14 +9,15 @@ import com.example.doyourself.ui.pages.createProcedure.shared.ContentBlock
 import com.example.doyourself.ui.pages.createProcedure.shared.ProcedureStep
 import java.sql.Date
 import java.sql.Time
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 suspend fun saveProcedureToRoom(
     procedureId: String,
     title: String,
     steps: List<ProcedureStep>,
     backgroundColor: String,
-    procedureDao: ProcedureDao,
-    navController: NavController
+    procedureDao: ProcedureDao
 ) {
     // Delete and replace (cascade handles cleanup)
     procedureDao.deleteProcedure(procedureId)
@@ -25,7 +26,7 @@ suspend fun saveProcedureToRoom(
         ProcedureDraftEntity(
             id = procedureId,
             title = title,
-            createdAt = Date(System.currentTimeMillis()).toString().toLong(),
+            createdAt = System.currentTimeMillis().toString().toLong(),
             backGroundColor = backgroundColor
         )
     )

@@ -19,7 +19,6 @@ import com.example.doyourself.data.local.db.ProcedureDao
 import com.example.doyourself.ui.pages.createProcedure.components.*
 import com.example.doyourself.ui.pages.createProcedure.components.bottomBar.BottomEditorBar
 import com.example.doyourself.ui.pages.createProcedure.components.stepList.StepsHolderBar
-import com.example.doyourself.ui.pages.createProcedure.components.stepList.StepsHorizontalPager
 import com.example.doyourself.ui.pages.createProcedure.components.topBar.TopEditorBar
 import com.example.doyourself.ui.pages.createProcedure.viewmodel.ProcedureEditorViewModel
 import com.example.doyourself.ui.pages.createProcedure.viewmodel.ProcedureEditorViewModelFactory
@@ -27,6 +26,11 @@ import kotlinx.coroutines.launch
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.saveable.rememberSaveable
+import com.example.doyourself.ui.pages.createProcedure.components.stepList.StepNavigationRow
+import com.example.doyourself.ui.pages.createProcedure.components.stepList.StepsScreen
+import com.example.doyourself.ui.pages.createProcedure.shared.ContentBlock
+import java.util.UUID
 
 
 @Composable
@@ -36,10 +40,14 @@ fun CreateProcedureScreen(
     draftId: String? = null
 ) {
     // Disable system back button on this screen
-    BackHandler(enabled = true) { /* no-op to block back navigation */ }
+    BackHandler {
+        navController.navigate("main") {
+            popUpTo(0) { inclusive = true }
+        }
+    }
     // 1) Obtain our VM instance
     val viewModel: ProcedureEditorViewModel = viewModel(
-        factory = ProcedureEditorViewModelFactory(procedureDao, navController)
+        factory = ProcedureEditorViewModelFactory(procedureDao)
     )
 
     val scrollState = rememberScrollState()
@@ -65,6 +73,8 @@ fun CreateProcedureScreen(
 
     // State controlling whether the "Add Block" menu is visible.
     var showAddMenu by remember { mutableStateOf(false) }
+    var selectedStepIndexForMenu by remember { mutableStateOf<Int?>(null) }
+    var showMenuForStep by remember { mutableStateOf<Int?>(null) } // step index or null
 
     Scaffold(
         topBar = {
@@ -75,10 +85,11 @@ fun CreateProcedureScreen(
                 onColorChange = viewModel::onColorChange,
                 onSave = {
                     viewModel.saveProcedure(
+                        navController = navController,
                         onSuccess = {
                             // Navigate and remove this screen from back stack
-                            navController.navigate("draftManager") {
-                                popUpTo("CreateProcedureScreen") { inclusive = true }
+                            navController.navigate("drafts") {
+                                popUpTo(0) { inclusive = true }
                             }
                         },
                         onError = { error ->
@@ -99,117 +110,52 @@ fun CreateProcedureScreen(
                 val currentStep = steps.getOrNull(pagerState.currentPage)
                 if (currentStep != null) {
 
-                    viewModel.addBlock(currentStep, com.example.doyourself.ui.pages.createProcedure.shared.ContentBlock.Text("", java.util.UUID.randomUUID().toString()))
+                    viewModel.addBlock(currentStep, ContentBlock.Text("", UUID.randomUUID().toString()))
                 }
             }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Block")
             }
         },
         bottomBar = {
-            BottomEditorBar(onAddStep = viewModel::addStep)
+            BottomEditorBar(onAddStep = {
+                viewModel.addStep()
+                coroutineScope.launch {
+                    pagerState.scrollToPage(viewModel.steps.lastIndex)
+                }
+            })
         }
     ) { innerPadding ->
         Box(modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
         ) {
-            // Place the StepsHolderBar at the top-center for reordering steps.
+            /* Place the StepsHolderBar at the top-center for reordering steps.
             Box(modifier = Modifier
                 .align(Alignment.TopCenter)
                 .padding(top = 8.dp)
             ) {
                 StepsHolderBar(
-                    onMoveLeft = {
-                        // Move current step left if possible.
-                        coroutineScope.launch {
-                            viewModel.moveStepLeft(pagerState.currentPage)
-                        }
-                    },
-                    onMoveRight = {
-                        coroutineScope.launch {
-                            viewModel.moveStepRight(pagerState.currentPage)
-                        }
-                    }
+                    stepIndex = pagerState.currentPage,
+                    onDeleteStep = { viewModel.deleteStep(steps[pagerState.currentPage]) },
+                    onDuplicateStep = { /*viewModel.duplicateStep(it)*/ },
+                    onMoveLeft = { coroutineScope.launch { viewModel.moveStepLeft(it) } },
+                    onMoveRight = { coroutineScope.launch { viewModel.moveStepRight(it) } }
                 )
-            }
+            }*/
             // Horizontal pager for steps.
-            StepsHorizontalPager(
+            StepsScreen(
                 steps = steps,
                 onAddBlock = { step, block -> viewModel.addBlock(step, block) },
                 onRemoveBlock = { step, index -> viewModel.deleteBlock(step, index) },
                 onDuplicateBlock = { step, index -> viewModel.duplicateBlock(step, index) },
                 onMoveBlock = { step, from, to -> viewModel.moveBlock(step, from, to) },
                 onRemoveStep = { step -> viewModel.deleteStep(step) },
-                onMoveStepLeft = { currentIndex -> viewModel.moveStepLeft(currentIndex) },
-                onMoveStepRight = { currentIndex -> viewModel.moveStepRight(currentIndex) },
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                currentStepIndex = viewModel.currentStepIndex,
+                onStepSelected = { viewModel.currentStepIndex = it },
+                onDuplicateStep = { currentStepIndex -> viewModel.duplicateStep(currentStepIndex)}
             )
         }
     }
 
-
-
-    /*
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(16.dp)
-    ) {
-        // Title + Save
-        Row(
-            horizontalArrangement = Arrangement.Absolute.SpaceBetween
-        ) {
-            Text("Procedure Title", style = MaterialTheme.typography.titleMedium)
-
-            SaveProcedureButton(
-                onSaveClick = {
-                    // Let the VM do the save
-                    viewModel.saveProcedure(
-                        onSuccess = {
-                            // Pop back on success
-                            navController.popBackStack()
-                        },
-                        onError = {
-                            // Show an error message or toast
-                            // your choice
-                        }
-                    )
-                }
-            )
-        }
-
-        TitleEditor(
-            title = title,
-            onTitleChange = { viewModel.onTitleChange(it) }
-        )
-
-        // Steps List
-        StepsList(
-            steps = steps,
-            onRemoveStep = { step ->
-                viewModel.deleteStep(step)
-            },
-            onMoveStepUp = { index ->
-                viewModel.moveStepUp(index)
-            },
-            onMoveStepDown = { index ->
-                viewModel.moveStepDown(index)
-            }/*,
-            onAddBlock = { step, block ->
-                viewModel.addBlock(step, block)
-            },
-            onDeleteBlock = { step, blockIndex ->
-                viewModel.deleteBlock(step, blockIndex)
-            },
-            onMoveBlock = { step, from, to ->
-                viewModel.moveBlock(step, from, to)
-            }*/
-        )
-
-        // Add Step
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            AddStepButton(onClick = { viewModel.addStep() })
-        }
-    }*/
 }

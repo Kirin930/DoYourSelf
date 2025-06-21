@@ -25,7 +25,7 @@ fun StepsList(
             stepNumber = index + 1,
             onAddBlock = { addBlock(step, it) },
             onRemoveBlock = { deleteBlock(step, it) },
-            onRemoveStep = { onRemoveStep(step) },
+            //onRemoveStep = { onRemoveStep(step) },
             onMoveStepUp = { onMoveStepUp(index) },
             onMoveStepDown = { onMoveStepDown(index) },
             onDuplicateBlock = { blockIndex -> onDuplicateBlock(step, blockIndex) },

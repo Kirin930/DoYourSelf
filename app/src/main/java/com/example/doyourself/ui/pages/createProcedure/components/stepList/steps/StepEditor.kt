@@ -33,7 +33,7 @@ fun StepEditor(
     onRemoveBlock: (index: Int) -> Unit,
     onDuplicateBlock: (index: Int) -> Unit,
     onMoveBlock: (from: Int, to: Int) -> Unit,
-    onRemoveStep: () -> Unit,
+    //onRemoveStep: () -> Unit,
     onMoveStepUp: () -> Unit,    // Not used now; steps are reordered horizontally.
     onMoveStepDown: () -> Unit,  // Not used now.
     modifier: Modifier = Modifier
