@@ -103,45 +103,64 @@ fun CreateProcedureScreen(
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
-            // FloatingActionButton for adding a new Block to the current step.
-            FloatingActionButton(onClick = {
-                // Open modal bottom sheet with choices (Text, Image, Video, Title)
-                // For now, for simplicity, add a default Text Block to current step.
-                val currentStep = steps.getOrNull(pagerState.currentPage)
-                if (currentStep != null) {
-
-                    viewModel.addBlock(currentStep, ContentBlock.Text("", UUID.randomUUID().toString()))
+            ExpandableFabMenu(
+                onAddTitle = {
+                    viewModel.addBlock(
+                        step = viewModel.steps[viewModel.currentStepIndex],
+                        block = ContentBlock.Title(
+                            text = "New Title",
+                            id = UUID.randomUUID().toString()
+                        )
+                    )
+                },
+                onAddText = {
+                    viewModel.addBlock(
+                        step = viewModel.steps[viewModel.currentStepIndex],
+                        block = ContentBlock.Text(
+                            text = "New Text",
+                            id = UUID.randomUUID().toString()
+                        )
+                    )
+                },
+                onAddImage = {/*
+                    // Optional: open image picker, or use a placeholder
+                    viewModel.addBlock(
+                        step = viewModel.steps[viewModel.currentStepIndex],
+                        block = ContentBlock.Image(
+                            uri = "", // placeholder or selected image URI
+                            id = UUID.randomUUID().toString()
+                        )
+                    )
+                */},
+                onAddVideo = {/*
+                    viewModel.addBlock(
+                        step = viewModel.steps[viewModel.currentStepIndex],
+                        block = ContentBlock.Video(
+                            uri = "", // placeholder or selected video URI
+                            id = UUID.randomUUID().toString()
+                        )
+                    )
+                */},
+                onAddStep = {
+                    viewModel.addStep()
+                    viewModel.currentStepIndex = viewModel.steps.lastIndex
                 }
-            }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Block")
-            }
+            )
         },
         bottomBar = {
-            BottomEditorBar(onAddStep = {
+           /*BottomEditorBar(onAddStep = {
                 viewModel.addStep()
                 coroutineScope.launch {
                     pagerState.scrollToPage(viewModel.steps.lastIndex)
                 }
             })
-        }
+        */}
     ) { innerPadding ->
         Box(modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
+            .imePadding() // keeps FAB visible above keyboard
         ) {
-            /* Place the StepsHolderBar at the top-center for reordering steps.
-            Box(modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 8.dp)
-            ) {
-                StepsHolderBar(
-                    stepIndex = pagerState.currentPage,
-                    onDeleteStep = { viewModel.deleteStep(steps[pagerState.currentPage]) },
-                    onDuplicateStep = { /*viewModel.duplicateStep(it)*/ },
-                    onMoveLeft = { coroutineScope.launch { viewModel.moveStepLeft(it) } },
-                    onMoveRight = { coroutineScope.launch { viewModel.moveStepRight(it) } }
-                )
-            }*/
             // Horizontal pager for steps.
             StepsScreen(
                 steps = steps,

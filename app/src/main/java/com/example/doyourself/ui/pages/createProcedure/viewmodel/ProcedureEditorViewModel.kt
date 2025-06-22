@@ -57,7 +57,7 @@ class ProcedureEditorViewModel(
             if (draftId == null) {
                 // For a new procedure, just ensure we have at least one step
                 if (steps.isEmpty()) {
-                    steps.add(ProcedureStep())
+                    addStep()
                 }
             } else {
                 val full = procedureDao.getFullProcedure(draftId)

@@ -128,10 +128,10 @@ fun StepEditor(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(12.dp))
+        /*Spacer(modifier = Modifier.height(12.dp))
         // (For debugging, you might want a small inline add block button here, but the FAB handles adding blocks.)
         Button(onClick = { onAddBlock(ContentBlock.Text("", java.util.UUID.randomUUID().toString())) }, modifier = Modifier.fillMaxWidth()) {
             Text("Add Block")
-        }
+        }*/
     }
 }
