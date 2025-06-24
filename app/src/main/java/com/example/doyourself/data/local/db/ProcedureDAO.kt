@@ -57,14 +57,37 @@ interface ProcedureDao {
     @Query("SELECT * FROM procedures WHERE isPublished = 1")
     suspend fun getPublishedProcedures(): List<ProcedureWithStepsAndBlocks>
 
-    //@Query("UPDATE procedures SET firestoreId = :firestoreId WHERE id = :procedureId")
-    //suspend fun setFirestoreId(procedureId: String, firestoreId: String)
+    // Liked procedures operations
+    @Transaction
+    suspend fun insertFullLikedProcedure(
+        procedure: LikedProcedureEntity,
+        steps: List<LikedStepEntity>,
+        blocks: List<LikedBlockEntity>
+    ) {
+        insertLikedProcedure(procedure)
+        insertLikedSteps(steps)
+        insertLikedBlocks(blocks)
+    }
 
-    //@Query("UPDATE procedures SET storagePaths = :storagePaths WHERE id = :procedureId")
-    //suspend fun setStoragePaths(procedureId: String, storagePaths: List<String>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLikedProcedure(procedure: LikedProcedureEntity)
 
-    //@Query("SELECT storagePaths FROM procedures WHERE id = :procedureId")
-    //suspend fun getFirestoreStorageInfo(procedureId: String): Pair<String?, List<String>>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLikedSteps(steps: List<LikedStepEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLikedBlocks(blocks: List<LikedBlockEntity>)
+
+    @Transaction
+    @Query("SELECT * FROM liked_procedures WHERE id = :procedureId")
+    suspend fun getLikedProcedure(procedureId: String): LikedProcedureWithStepsAndBlocks?
+
+    @Transaction
+    @Query("SELECT * FROM liked_procedures ORDER BY createdAt DESC")
+    fun getLikedProcedures(): Flow<List<LikedProcedureWithStepsAndBlocks>>
+
+    @Query("DELETE FROM liked_procedures WHERE id = :procedureId")
+    suspend fun deleteLikedProcedure(procedureId: String)
 
     @Query("UPDATE procedures SET backGroundColor = :backgroundColor WHERE id = :procedureId")
     suspend fun updateProcedureBackgroundColor(procedureId: String, backgroundColor: String)

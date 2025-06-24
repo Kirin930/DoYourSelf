@@ -33,8 +33,10 @@ fun DraftManagerScreen(
     val procedures by viewModel.procedures.collectAsState()
     val procedureToDelete = viewModel.procedureToDelete
 
+    val likedProcedures by viewModel.likedProcedures.collectAsState()
+
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabTitles = listOf("Published", "Drafts")
+    val tabTitles = listOf("Published", "Drafts", "Liked")
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("My Procedures", style = MaterialTheme.typography.headlineMedium)
@@ -54,7 +56,7 @@ fun DraftManagerScreen(
 
         // 2) Show content based on selectedTab
         when (selectedTab) {
-            0 ->  LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            0 -> LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(procedures) { procedure ->
                     ProcedureCard(
                         procedure = procedure,
@@ -69,6 +71,14 @@ fun DraftManagerScreen(
                         onOpen = { viewModel.openDraft(navController, draft.procedure.id) },
                         onDelete = { viewModel.onDeleteDraftRequested(draft.procedure.id) },
                         onPublish = { viewModel.publishDraft(navController, draft.procedure.id) }
+                    )
+                }
+            }
+            2 -> LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(likedProcedures) { procedure ->
+                    LikedProcedureCard(
+                        procedure = procedure,
+                        onDelete = {}
                     )
                 }
             }

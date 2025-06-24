@@ -33,6 +33,7 @@ fun ReadOnlyStep(
                 "text" -> ReadOnlyTextBlock(content)
                 "image" -> ReadOnlyImageBlock(content)
                 "video" -> ReadOnlyVideoBlock(content)
+                "title" -> ReadOnlyTitleBlock(content)
                 else -> Text("[Unsupported block]")
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -44,6 +45,12 @@ fun ReadOnlyStep(
 fun ReadOnlyTextBlock(text: String) {
     // Just show text in a normal Text composable
     Text(text, style = MaterialTheme.typography.bodyLarge)
+}
+
+@Composable
+fun ReadOnlyTitleBlock(text: String) {
+    // Just show text in a normal Text composable
+    Text(text, style = MaterialTheme.typography.headlineSmall)
 }
 
 @Composable

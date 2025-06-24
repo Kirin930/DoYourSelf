@@ -9,11 +9,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.navigation.NavHostController
 import androidx.compose.material.icons.filled.Add
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.doyourself.data.local.db.ProcedureDao
+import com.example.doyourself.ui.pages.MainScreen.components.PublishedProcedureCard
+import com.example.doyourself.ui.pages.MainScreen.viewmodel.MainScreenViewModel
+import com.example.doyourself.ui.pages.MainScreen.viewmodel.MainScreenViewModelFactory
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(navController: NavHostController, procedureDao: ProcedureDao) {
+    val viewModel: MainScreenViewModel = viewModel(
+        factory = MainScreenViewModelFactory(procedureDao)
+    )
+
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
+    val procedures by viewModel.procedures.collectAsState()
+    val likedIds by viewModel.likedIds.collectAsState()
 
     Scaffold(
         topBar = {
@@ -53,10 +67,20 @@ fun MainScreen(navController: NavHostController) {
             }
         }
     ) { innerPadding ->
-        Box(modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxSize()) {
-            Text("Main Screen Content Goes Here")
+        val filtered = procedures.filter { it.title.contains(searchQuery.text, ignoreCase = true) }
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(filtered) { procedure ->
+                PublishedProcedureCard(
+                    procedure = procedure,
+                    liked = likedIds.contains(procedure.id),
+                    onLike = { viewModel.likeProcedure(procedure) }
+                )
+            }
         }
     }
 }

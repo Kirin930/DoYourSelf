@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.doyourself.data.local.db.ProcedureDao
 import com.example.doyourself.data.local.entities.ProcedureWithStepsAndBlocks
+import com.example.doyourself.data.local.entities.LikedProcedureWithStepsAndBlocks
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
@@ -29,6 +30,10 @@ class DraftManagerViewModel(
     private val _procedures = MutableStateFlow<List<ProcedureWithStepsAndBlocks>>(emptyList())
     val procedures: StateFlow<List<ProcedureWithStepsAndBlocks>> = _procedures
 
+    private val _likedProcedures = MutableStateFlow<List<LikedProcedureWithStepsAndBlocks>>(emptyList())
+    val likedProcedures: StateFlow<List<LikedProcedureWithStepsAndBlocks>> = _likedProcedures
+
+
     // Holds the ID of the draft the user wants to delete
     var draftToDelete by mutableStateOf<String?>(null)
         private set
@@ -44,14 +49,11 @@ class DraftManagerViewModel(
                 _procedures.value = list.filter { it.procedure.isPublished }
                 _drafts.value     = list.filter { !it.procedure.isPublished }
 
-                //_drafts.value = list
-                /*for (draft in list) {
-                    if (draft.procedure.isPublished) {
-                        _procedures.value += draft
-                    } else {
-                        _drafts.value += draft
-                    }
-                }*/
+            }
+        }
+        viewModelScope.launch {
+            procedureDao.getLikedProcedures().collectLatest { liked ->
+                _likedProcedures.value = liked
             }
         }
     }
