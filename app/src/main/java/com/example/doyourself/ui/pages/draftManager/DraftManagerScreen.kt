@@ -38,68 +38,67 @@ fun DraftManagerScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabTitles = listOf("Published", "Drafts", "Liked")
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("My Procedures", style = MaterialTheme.typography.headlineMedium)
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+            Text("My Procedures", style = MaterialTheme.typography.headlineMedium)
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        //Tab Row (too choose with tab we have to show
-        TabRow(selectedTabIndex = selectedTab) {
-            tabTitles.forEachIndexed { index, title ->
-                Tab(
-                    selected = (selectedTab == index),
-                    onClick = { selectedTab = index },
-                    text = { Text(title) }
-                )
+            //Tab Row (too choose with tab we have to show
+            TabRow(selectedTabIndex = selectedTab) {
+                tabTitles.forEachIndexed { index, title ->
+                    Tab(
+                        selected = (selectedTab == index),
+                        onClick = { selectedTab = index },
+                        text = { Text(title) }
+                    )
+                }
+            }
+
+            // 2) Show content based on selectedTab
+            when (selectedTab) {
+                0 -> LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(procedures) { procedure ->
+                        ProcedureCard(
+                            procedure = procedure,
+                            onDelete = { viewModel.onDeleteProcedureRequested(procedure.procedure.id) },
+                            onExecute = { navController.navigate("execute/${procedure.procedure.id}") }
+                        )
+                    }
+                }
+
+                1 -> LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(drafts) { draft ->
+                        DraftCard(
+                            draft = draft,
+                            onOpen = { viewModel.openDraft(navController, draft.procedure.id) },
+                            onDelete = { viewModel.onDeleteDraftRequested(draft.procedure.id) },
+                            onPublish = {
+                                viewModel.publishDraft(
+                                    navController,
+                                    draft.procedure.id
+                                )
+                            },
+                            onExecute = { navController.navigate("execute/${draft.procedure.id}") }
+
+                        )
+                    }
+                }
+
+                2 -> LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(likedProcedures) { procedure ->
+                        LikedProcedureCard(
+                            procedure = procedure,
+                            onDelete = {},
+                            onExecute = { navController.navigate("execute/${procedure.procedure.id}") }
+                        )
+                    }
+                }
             }
         }
-
-        // 2) Show content based on selectedTab
-        when (selectedTab) {
-            0 -> LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items(procedures) { procedure ->
-                    ProcedureCard(
-                        procedure = procedure,
-                        onDelete = { viewModel.onDeleteProcedureRequested(procedure.procedure.id) },
-                        onExecute = { navController.navigate("execute/${procedure.procedure.id}") }
-                    )
-                }
-            }
-            1 -> LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items(drafts) { draft ->
-                    DraftCard(
-                        draft = draft,
-                        onOpen = { viewModel.openDraft(navController, draft.procedure.id) },
-                        onDelete = { viewModel.onDeleteDraftRequested(draft.procedure.id) },
-                        onPublish = { viewModel.publishDraft(navController, draft.procedure.id) },
-                        onExecute = { navController.navigate("execute/${draft.procedure.id}") }
-
-                    )
-                }
-            }
-            2 -> LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items(likedProcedures) { procedure ->
-                    LikedProcedureCard(
-                        procedure = procedure,
-                        onDelete = {},
-                        onExecute = { navController.navigate("execute/${procedure.procedure.id}") }
-                    )
-                }
-            }
-        }
-
-
-        /*
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(drafts) { draft ->
-                DraftCard(
-                    draft = draft,
-                    onOpen = { viewModel.openDraft(navController, draft.procedure.id) },
-                    onDelete = { viewModel.onDeleteDraftRequested(draft.procedure.id) },
-                    onPublish = { viewModel.publishDraft(navController, draft.procedure.id) }
-                )
-            }
-        }*/
     }
 
     draftToDelete?.let { draftId ->

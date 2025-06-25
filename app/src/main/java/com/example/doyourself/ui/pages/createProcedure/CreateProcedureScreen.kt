@@ -77,6 +77,7 @@ fun CreateProcedureScreen(
     var showMenuForStep by remember { mutableStateOf<Int?>(null) } // step index or null
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopEditorBar(
                 title = viewModel.title,

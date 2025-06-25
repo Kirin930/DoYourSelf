@@ -36,40 +36,53 @@ fun AccountScreen() {
     val user = FirebaseAuth.getInstance().currentUser
     var showLogoutDialog by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        // Profile Info
-        if (user != null) {
-            Image(
-                painter = rememberAsyncImagePainter(user.photoUrl),
-                contentDescription = null,
-                modifier = Modifier.size(100.dp)
-            )
-            Text(text = user.displayName ?: "Anonymous", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Profile Info
+            if (user != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(user.photoUrl),
+                    contentDescription = null,
+                    modifier = Modifier.size(100.dp)
+                )
+                Text(
+                    text = user.displayName ?: "Anonymous",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-        // Actions
-        SettingsActionItem(icon = Icons.Default.Email, label = "Contact Support") {
-            Toast.makeText(context, "Support feature coming soon!", Toast.LENGTH_SHORT).show()
-        }
+            // Actions
+            SettingsActionItem(icon = Icons.Default.Email, label = "Contact Support") {
+                Toast.makeText(context, "Support feature coming soon!", Toast.LENGTH_SHORT).show()
+            }
 
-        SettingsActionItem(icon = Icons.Default.Settings, label = "App Version") {
-            Toast.makeText(context, "Version 1.0.0", Toast.LENGTH_SHORT).show()
-        }
+            SettingsActionItem(icon = Icons.Default.Settings, label = "App Version") {
+                Toast.makeText(context, "Version 1.0.0", Toast.LENGTH_SHORT).show()
+            }
 
-        SettingsActionItem(icon = Icons.Default.Close, label = "Logout") {
-            showLogoutDialog = true
-        }
+            SettingsActionItem(icon = Icons.Default.Close, label = "Logout") {
+                showLogoutDialog = true
+            }
 
-        SettingsActionItem(icon = Icons.Default.Delete, label = "Delete Account") {
-            Toast.makeText(context, "Account deletion will be implemented later.", Toast.LENGTH_SHORT).show()
+            SettingsActionItem(icon = Icons.Default.Delete, label = "Delete Account") {
+                Toast.makeText(
+                    context,
+                    "Account deletion will be implemented later.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -104,6 +117,10 @@ fun AccountScreen() {
 fun SettingsActionItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        ),
         modifier = Modifier.fillMaxWidth()
     ) {
         Icon(imageVector = icon, contentDescription = label)

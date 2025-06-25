@@ -15,7 +15,7 @@ fun SaveProcedureButton(
 
     Button(
         onClick = { showConfirmDialog = true },
-        modifier = Modifier.width(100.dp).padding(8.dp)
+        modifier = Modifier.width(120.dp).padding(8.dp)
     ) {
         Text("Save")
     }

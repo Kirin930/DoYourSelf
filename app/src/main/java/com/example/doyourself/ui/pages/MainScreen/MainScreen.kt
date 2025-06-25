@@ -1,5 +1,11 @@
 package com.example.doyourself.ui.pages.MainScreen
 
+import android.R
+import android.graphics.drawable.shapes.OvalShape
+import android.graphics.drawable.shapes.Shape
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -16,6 +22,7 @@ import com.example.doyourself.ui.pages.MainScreen.viewmodel.MainScreenViewModel
 import com.example.doyourself.ui.pages.MainScreen.viewmodel.MainScreenViewModelFactory
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,6 +37,7 @@ fun MainScreen(navController: NavHostController, procedureDao: ProcedureDao) {
     val likedIds by viewModel.likedIds.collectAsState()
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -37,30 +45,37 @@ fun MainScreen(navController: NavHostController, procedureDao: ProcedureDao) {
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         placeholder = { Text("Search procedures or users...") },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().absolutePadding(left = 0.dp, top = 2.dp, right = 10.dp, bottom = 2.dp)
                     )
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
             )
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar (
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Create, contentDescription = "Drafts") },
+                    icon = { Icon(Icons.Default.Create, contentDescription = "Drafts", tint = MaterialTheme.colorScheme.onPrimary) },
                     selected = false,
                     onClick = { navController.navigate("drafts") }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Add, contentDescription = "Create") },
+                    icon = { Icon(Icons.Default.Add, contentDescription = "Create", tint = MaterialTheme.colorScheme.onPrimary) },
                     selected = false,
                     onClick = { navController.navigate("create") }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Account") },
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Account", tint = MaterialTheme.colorScheme.onPrimary) },
                     selected = false,
                     onClick = { navController.navigate("account") }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Email, contentDescription = "Messages") },
+                    icon = { Icon(Icons.Default.Email, contentDescription = "Messages", tint = MaterialTheme.colorScheme.onPrimary) },
                     selected = false,
                     onClick = { navController.navigate("messages") }
                 )

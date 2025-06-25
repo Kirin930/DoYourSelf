@@ -55,7 +55,7 @@ fun TopEditorBar(
                     onTitleChange = onTitleChange
                 )
 
-                    // The circular color picker below the title.
+                    /* The circular color picker below the title.
                 FloatingColorPicker(
                     anchor = { open ->
                         Icon(
@@ -80,10 +80,10 @@ fun TopEditorBar(
                     swatches = swatches,
                     selected = selectedColor,
                     onColorChosen = onColorChange
-                )
+                )*/
             }
 
-            Box(modifier = Modifier.width(100.dp)) {
+            Box(modifier = Modifier.width(120.dp)) {
                 SaveProcedureButton(onSaveClick = onSave)
             }
         }
