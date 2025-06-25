@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -76,56 +78,62 @@ class MainActivity : ComponentActivity() {
             FirebaseAppCheck.getInstance().installAppCheckProviderFactory(providerFactory)
 
 
-            MaterialTheme {
-                NavHost(
-                    navController,
-                    startDestination = if (user != null) "main" else "login"
+            DoYourSelfTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
                 ) {
-                    composable("login") {
-                        LoginScreen {
-                            // onLoginSuccess: do nothing, recomposition will re-trigger
+                    NavHost(
+                        navController,
+                        startDestination = if (user != null) "main" else "login"
+                    ) {
+                        composable("login") {
+                            LoginScreen {
+                                // onLoginSuccess: do nothing, recomposition will re-trigger
+                            }
+                        }
+                        composable("main") {
+                            MainScreen(navController, dao)
+                        }
+                        composable("create") {
+                            CreateProcedureScreen(navController, dao)
+                        }
+                        composable("account") {
+                            AccountScreen()
+                        }
+                        composable("messages") {
+                            MessagesScreen()
+                        }
+                        composable("create/{draftId}") { backStackEntry ->
+                            val draftId = backStackEntry.arguments?.getString("draftId")
+                            CreateProcedureScreen(navController, dao, draftId)
+                        }
+                        composable("drafts") {
+                            DraftManagerScreen(
+                                navController = navController,
+                                procedureDao = dao
+                            )
+                        }
+                        composable("preview/{draftId}") { backStackEntry ->
+                            val draftId =
+                                backStackEntry.arguments?.getString("draftId") ?: return@composable
+                            PreviewScreen(
+                                navController = navController,
+                                procedureDao = dao,
+                                draftId = draftId
+                            )
+                        }
+                        composable("execute/{procedureId}") { backStackEntry ->
+                            val pid =
+                                backStackEntry.arguments?.getString("procedureId")
+                                    ?: return@composable
+                            ExecuteScreen(
+                                navController = navController,
+                                procedureDao = dao,
+                                procedureId = pid
+                            )
                         }
                     }
-                    composable("main") {
-                        MainScreen(navController, dao)
-                    }
-                    composable("create") {
-                        CreateProcedureScreen(navController, dao)
-                    }
-                    composable("account") {
-                        AccountScreen()
-                    }
-                    composable("messages") {
-                        MessagesScreen()
-                    }
-                    composable("create/{draftId}") { backStackEntry ->
-                        val draftId = backStackEntry.arguments?.getString("draftId")
-                        CreateProcedureScreen(navController, dao, draftId)
-                    }
-                    composable("drafts") {
-                        DraftManagerScreen(
-                            navController = navController,
-                            procedureDao = dao
-                        )
-                    }
-                    composable("preview/{draftId}") { backStackEntry ->
-                        val draftId = backStackEntry.arguments?.getString("draftId") ?: return@composable
-                        PreviewScreen(
-                            navController = navController,
-                            procedureDao = dao,
-                            draftId = draftId
-                        )
-                    }
-                    composable("execute/{procedureId}") { backStackEntry ->
-                        val pid = backStackEntry.arguments?.getString("procedureId") ?: return@composable
-                        ExecuteScreen(
-                            navController = navController,
-                            procedureDao = dao,
-                            procedureId = pid
-                        )
-                    }
-
-                    // Add other screens here (account, messages, etc.)
                 }
             }
 

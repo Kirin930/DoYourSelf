@@ -2,6 +2,11 @@ package com.example.doyourself.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+// Main application colors
+val MainGreen = Color(0xFF2B7B78)
+val LightGray = Color(0xFFF2F2F2)
+
+// Legacy colors kept for reference in previews (not used by the theme)
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)

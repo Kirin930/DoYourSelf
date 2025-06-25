@@ -12,6 +12,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.doyourself.R
+import com.example.doyourself.ui.theme.MainGreen
+import com.example.doyourself.ui.theme.LightGray
 
 // Declare your custom font family once.
 val MyCustomFontFamily = FontFamily(
@@ -63,6 +65,34 @@ private val WarmDarkColorScheme = darkColorScheme(
     onSurface = Color.White,
 )
 
+// Light color scheme based on the requested palette.
+private val LightColorScheme = lightColorScheme(
+    primary = MainGreen,
+    onPrimary = LightGray,
+    secondary = MainGreen,
+    onSecondary = LightGray,
+    tertiary = MainGreen,
+    onTertiary = LightGray,
+    background = LightGray,
+    onBackground = Color.Black,
+    surface = Color.White,
+    onSurface = Color.Black,
+)
+
+// Dark color scheme adjusted for readability.
+private val DarkColorScheme = darkColorScheme(
+    primary = MainGreen,
+    onPrimary = LightGray,
+    secondary = MainGreen,
+    onSecondary = LightGray,
+    tertiary = MainGreen,
+    onTertiary = LightGray,
+    background = Color(0xFF121212),
+    onBackground = LightGray,
+    surface = Color(0xFF1E1E1E),
+    onSurface = LightGray,
+)
+
 @Composable
 fun DoYourSelfTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -70,7 +100,7 @@ fun DoYourSelfTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) WarmDarkColorScheme else WarmLightColorScheme
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
