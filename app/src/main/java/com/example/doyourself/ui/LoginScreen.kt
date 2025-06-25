@@ -15,12 +15,21 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import com.example.doyourself.R
 
 
 @Composable
 fun LoginScreen(onLoginSuccess: () -> Unit) {
     val context = LocalContext.current
-    val activity = context as Activity
 
     var loading by remember { mutableStateOf(false) }
 
@@ -73,21 +82,54 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 
     val googleSignInClient = GoogleSignIn.getClient(context, signInOptions)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        verticalArrangement = Arrangement.Center
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        if (loading) {
-            CircularProgressIndicator()
-        } else {
-            Button(onClick = {
-                loading = true
-                val signInIntent = googleSignInClient.signInIntent
-                launcher.launch(signInIntent)
-            }) {
-                Text("Sign in with Google")
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_dys_logo_playstore),
+                contentDescription = "Welcome on DYS",
+                modifier = Modifier.size(96.dp)
+                    .border(BorderStroke(3.dp, MaterialTheme.colorScheme.primary))
+            )
+            Text(
+                text = "Benvenuto su DoYourSelf",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            if (loading) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            } else {
+                Button(
+                    onClick = {
+                        loading = true
+                        val signInIntent = googleSignInClient.signInIntent
+                        launcher.launch(signInIntent)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Sign in with Google",
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
             }
         }
     }
