@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,6 +17,7 @@ fun ProcedureCard(
     procedure: ProcedureWithStepsAndBlocks,
     //onOpen: () -> Unit,
     onDelete: () -> Unit,
+    onExecute: () -> Unit
 ) {
     Card (
         modifier = Modifier.fillMaxSize().clickable { /*onOpen()*/ }
@@ -45,6 +47,12 @@ fun ProcedureCard(
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete Procedure"
+                        )
+                    }
+                    IconButton(onClick = onExecute) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = "Execute Procedure"
                         )
                     }
                 }

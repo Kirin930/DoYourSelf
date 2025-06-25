@@ -60,7 +60,8 @@ fun DraftManagerScreen(
                 items(procedures) { procedure ->
                     ProcedureCard(
                         procedure = procedure,
-                        onDelete = { viewModel.onDeleteProcedureRequested(procedure.procedure.id) }
+                        onDelete = { viewModel.onDeleteProcedureRequested(procedure.procedure.id) },
+                        onExecute = { navController.navigate("execute/${procedure.procedure.id}") }
                     )
                 }
             }
@@ -70,7 +71,9 @@ fun DraftManagerScreen(
                         draft = draft,
                         onOpen = { viewModel.openDraft(navController, draft.procedure.id) },
                         onDelete = { viewModel.onDeleteDraftRequested(draft.procedure.id) },
-                        onPublish = { viewModel.publishDraft(navController, draft.procedure.id) }
+                        onPublish = { viewModel.publishDraft(navController, draft.procedure.id) },
+                        onExecute = { navController.navigate("execute/${draft.procedure.id}") }
+
                     )
                 }
             }
@@ -78,7 +81,8 @@ fun DraftManagerScreen(
                 items(likedProcedures) { procedure ->
                     LikedProcedureCard(
                         procedure = procedure,
-                        onDelete = {}
+                        onDelete = {},
+                        onExecute = { navController.navigate("execute/${procedure.procedure.id}") }
                     )
                 }
             }

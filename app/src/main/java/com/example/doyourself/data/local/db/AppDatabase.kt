@@ -14,9 +14,10 @@ import com.example.doyourself.data.local.entities.*
         BlockEntity::class,
         LikedProcedureEntity::class,
         LikedStepEntity::class,
-        LikedBlockEntity::class
+        LikedBlockEntity::class,
+        ProcedureProgressEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

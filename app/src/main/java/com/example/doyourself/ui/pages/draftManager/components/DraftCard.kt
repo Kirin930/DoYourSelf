@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,7 +18,8 @@ fun DraftCard(
     draft: ProcedureWithStepsAndBlocks,
     onOpen: () -> Unit,
     onDelete: () -> Unit,
-    onPublish: () -> Unit
+    onPublish: () -> Unit,
+    onExecute: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxSize().clickable { onOpen() }
@@ -42,6 +44,9 @@ fun DraftCard(
                     }
                     IconButton(onClick = onPublish) {
                         Icon(imageVector = Icons.Default.Share, contentDescription = "Publish Draft")
+                    }
+                    IconButton(onClick = onExecute) {
+                        Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "Execute")
                     }
                 }
             }

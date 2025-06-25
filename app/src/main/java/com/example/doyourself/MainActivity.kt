@@ -28,6 +28,7 @@ import com.example.doyourself.ui.pages.MessagesScreen
 import com.example.doyourself.ui.pages.createProcedure.CreateProcedureScreen
 import com.example.doyourself.ui.pages.draftManager.DraftManagerScreen
 import com.example.doyourself.ui.pages.previewProcedure.PreviewScreen
+import com.example.doyourself.ui.pages.executeProcedure.ExecuteScreen
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
@@ -113,6 +114,14 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             procedureDao = dao,
                             draftId = draftId
+                        )
+                    }
+                    composable("execute/{procedureId}") { backStackEntry ->
+                        val pid = backStackEntry.arguments?.getString("procedureId") ?: return@composable
+                        ExecuteScreen(
+                            navController = navController,
+                            procedureDao = dao,
+                            procedureId = pid
                         )
                     }
 
