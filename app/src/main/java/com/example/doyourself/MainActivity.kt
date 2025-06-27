@@ -1,5 +1,6 @@
 package com.example.doyourself
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -26,7 +27,8 @@ import androidx.navigation.compose.composable
 import androidx.room.Room
 import com.example.doyourself.data.local.db.AppDatabase
 import com.example.doyourself.ui.pages.AccountScreen
-import com.example.doyourself.ui.pages.MessagesScreen
+import com.example.doyourself.ui.pages.chats.ChatsManagerScreen
+import com.example.doyourself.ui.pages.chats.ChatScreen
 import com.example.doyourself.ui.pages.createProcedure.CreateProcedureScreen
 import com.example.doyourself.ui.pages.draftManager.DraftManagerScreen
 import com.example.doyourself.ui.pages.previewProcedure.PreviewScreen
@@ -101,8 +103,14 @@ class MainActivity : ComponentActivity() {
                         composable("account") {
                             AccountScreen()
                         }
-                        composable("messages") {
-                            MessagesScreen()
+                        composable("chats") {
+                            ChatsManagerScreen(navController)
+                        }
+                        composable("chat/{chatId}/{chatTitle}") { backStackEntry ->
+                            val chatId = backStackEntry.arguments?.getString("chatId") ?: return@composable
+                            val encodedTitle = backStackEntry.arguments?.getString("chatTitle") ?: ""
+                            val chatTitle = Uri.decode(encodedTitle)
+                            ChatScreen(chatId, chatTitle)
                         }
                         composable("create/{draftId}") { backStackEntry ->
                             val draftId = backStackEntry.arguments?.getString("draftId")

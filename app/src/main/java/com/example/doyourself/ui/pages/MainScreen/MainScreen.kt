@@ -3,6 +3,7 @@ package com.example.doyourself.ui.pages.MainScreen
 import android.R
 import android.graphics.drawable.shapes.OvalShape
 import android.graphics.drawable.shapes.Shape
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +21,7 @@ import com.example.doyourself.data.local.db.ProcedureDao
 import com.example.doyourself.ui.pages.MainScreen.components.PublishedProcedureCard
 import com.example.doyourself.ui.pages.MainScreen.viewmodel.MainScreenViewModel
 import com.example.doyourself.ui.pages.MainScreen.viewmodel.MainScreenViewModelFactory
+import com.example.doyourself.ui.pages.chats.model.ChatsViewModel
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.graphics.Color
@@ -31,6 +33,8 @@ fun MainScreen(navController: NavHostController, procedureDao: ProcedureDao) {
     val viewModel: MainScreenViewModel = viewModel(
         factory = MainScreenViewModelFactory(procedureDao)
     )
+
+    val chatsViewModel: ChatsViewModel = viewModel()
 
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     val procedures by viewModel.procedures.collectAsState()
@@ -77,7 +81,7 @@ fun MainScreen(navController: NavHostController, procedureDao: ProcedureDao) {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Email, contentDescription = "Messages", tint = MaterialTheme.colorScheme.onPrimary) },
                     selected = false,
-                    onClick = { navController.navigate("messages") }
+                    onClick = { navController.navigate("chats") }
                 )
             }
         }
@@ -93,7 +97,12 @@ fun MainScreen(navController: NavHostController, procedureDao: ProcedureDao) {
                 PublishedProcedureCard(
                     procedure = procedure,
                     liked = likedIds.contains(procedure.id),
-                    onLike = { viewModel.likeProcedure(procedure) }
+                    onLike = { viewModel.likeProcedure(procedure) },
+                    onChat = {
+                        chatsViewModel.createChat(procedure.title) { chatId ->
+                            navController.navigate("chat/$chatId/${Uri.encode(procedure.title)}\"")
+                        }
+                    }
                 )
             }
         }
